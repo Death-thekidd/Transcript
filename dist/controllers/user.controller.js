@@ -21,9 +21,8 @@ const user_model_1 = require("../models/user.model");
 const express_validator_1 = require("express-validator");
 require("../config/passport");
 const sequelize_1 = require("sequelize");
-const staff_model_1 = require("../models/staff.model");
-const student_model_1 = require("../models/student.model");
 const sendMail_1 = __importDefault(require("../sendMail"));
+const role_model_1 = require("../models/role.model");
 /**
  * Get all users
  * @route GET /users
@@ -49,16 +48,7 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        if (user.userType === "Student") {
-            const student = yield student_model_1.Student.findOne({
-                where: { UserID: user.id },
-            });
-            return res.status(200).json({ data: student });
-        }
-        const staff = yield staff_model_1.Staff.findOne({
-            where: { UserID: user.id },
-        });
-        return res.status(200).json({ data: staff });
+        return res.status(200).json({ data: user });
     }
     catch (error) {
         next(error);
@@ -93,6 +83,7 @@ const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function
                 return res.status(500).json({ error: err.message }); // Internal server error
             }
             // Return success message and user data as JSON
+            req.session.user = user;
             return res
                 .status(200)
                 .json({ message: "Success! You are logged in.", user });
@@ -142,28 +133,16 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             password: req.body.password,
             email: req.body.email,
         });
-        if (req.body.userType === "Staff") {
-            const staff = yield staff_model_1.Staff.create({
-                staffType: req.body.staffType,
-                username: user.username,
-                name: user.name,
-                email: user.email,
-                password: user.password,
-                UserID: user.id, // Associate with the User
-            });
+        const { role } = req.body;
+        const defaultRole = yield role_model_1.Role.findOne({
+            where: { name: role ? role : "User" },
+        });
+        if (defaultRole) {
+            yield user.addRole(defaultRole);
         }
-        else {
-            const student = yield student_model_1.Student.create({
-                guardianEmail: req.body.guardianEmail,
-                guardianPhone: req.body.guardianPhone,
-                guardianName: req.body.guardianName,
-                username: user.username,
-                name: user.name,
-                email: user.email,
-                password: user.password,
-                UserID: user.id, // Associate with the User
-            });
-        }
+        return res
+            .status(200)
+            .json({ message: "User created succesfully", data: user });
     }
     catch (error) {
         console.error("Unable to create User record : ", error);

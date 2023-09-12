@@ -1,4 +1,4 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/almanara/public_html/exiat/
+    - export DEPLOYPATH=/home/almanara/public_html/transcript-backend/
     - /bin/cp -R . $DEPLOYPATH

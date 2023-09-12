@@ -15,9 +15,6 @@ import { body, check, validationResult } from "express-validator";
 import "../config/passport";
 import { CallbackError, NativeError } from "mongoose";
 import { Op } from "sequelize";
-import sequelize from "../sequelize";
-import { Staff } from "../models/staff.model";
-import { Student } from "../models/student.model";
 import sendMail from "../sendMail";
 import { Role } from "../models/role.model";
 

@@ -16,19 +16,15 @@ exports.init = exports.User = exports.initUserModel = exports.UserType = void 0;
 const sequelize_1 = require("sequelize");
 const bcrypt_nodejs_1 = __importDefault(require("bcrypt-nodejs"));
 const sequelize_2 = __importDefault(require("../sequelize"));
-const staff_model_1 = require("./staff.model");
-const student_model_1 = require("./student.model");
-const leaveRequest_model_1 = require("./leaveRequest.model");
 const wallet_model_1 = require("./wallet.model");
 const walletTransaction_model_1 = require("./walletTransaction.model");
 const transaction_model_1 = require("./transaction.model");
+const role_model_1 = require("./role.model");
 // Define the UserType enum
 var UserType;
 (function (UserType) {
     UserType["Student"] = "Student";
-    UserType["Secretary"] = "Secretary";
-    UserType["ParentGuardian"] = "Parent/Guardian";
-    UserType["SecurityGuard"] = "SecurityGuard";
+    UserType["Staff"] = "Staff";
 })(UserType = exports.UserType || (exports.UserType = {}));
 const initUserModel = (sequelize) => {
     const User = sequelize.define("User", {
@@ -64,30 +60,6 @@ const initUserModel = (sequelize) => {
 };
 exports.initUserModel = initUserModel;
 exports.User = exports.initUserModel(sequelize_2.default);
-exports.User.hasOne(staff_model_1.Staff, { foreignKey: "UserID", as: "Staff" });
-staff_model_1.Staff.belongsTo(exports.User, {
-    foreignKey: "UserID",
-    constraints: false,
-    as: "User",
-});
-exports.User.hasOne(student_model_1.Student, { foreignKey: "UserID", as: "Student" });
-student_model_1.Student.belongsTo(exports.User, {
-    foreignKey: "UserID",
-    constraints: false,
-    as: "User",
-});
-staff_model_1.Staff.hasOne(leaveRequest_model_1.LeaveRequest, { foreignKey: "StaffID", as: "LeaveRequest" });
-leaveRequest_model_1.LeaveRequest.belongsTo(staff_model_1.Staff, {
-    foreignKey: "StaffID",
-    constraints: false,
-    as: "Staff",
-});
-student_model_1.Student.hasOne(leaveRequest_model_1.LeaveRequest, { foreignKey: "StudentID", as: "LeaveRequest" });
-leaveRequest_model_1.LeaveRequest.belongsTo(student_model_1.Student, {
-    foreignKey: "StudentID",
-    constraints: false,
-    as: "Student",
-});
 exports.User.hasOne(wallet_model_1.Wallet, { foreignKey: "UserID", as: "Wallet" });
 wallet_model_1.Wallet.belongsTo(exports.User, {
     foreignKey: "UserID",
@@ -108,6 +80,14 @@ walletTransaction_model_1.WalletTransaction.belongsTo(exports.User, {
     foreignKey: "UserID",
     constraints: false,
     as: "User",
+});
+exports.User.belongsToMany(role_model_1.Role, {
+    through: "user_roles",
+    foreignKey: "userId",
+});
+role_model_1.Role.belongsToMany(exports.User, {
+    through: "user_roles",
+    foreignKey: "roleId",
 });
 function init() {
     return __awaiter(this, void 0, void 0, function* () {

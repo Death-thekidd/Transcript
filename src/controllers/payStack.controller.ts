@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from "express";
 import async from "async";
 import https from "https";
 import { PAYSTACK_PUBLIC_KEY } from "../util/secrets";
-import { Student } from "../models/student.model";
 
 /**
  * Initialize Paystack payment gateway

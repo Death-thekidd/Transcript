@@ -31,7 +31,6 @@ const secrets_1 = require("./util/secrets");
 const connect_session_sequelize_1 = __importDefault(require("connect-session-sequelize"));
 // Controllers (route handlers)
 const userController = __importStar(require("./controllers/user.controller"));
-const leaveRequestController = __importStar(require("./controllers/leaveRequest.controller"));
 const payStackController = __importStar(require("./controllers/payStack.controller"));
 const walletController = __importStar(require("./controllers/wallet.controller"));
 const walletTransactionController = __importStar(require("./controllers/walletTransaction.controller"));
@@ -40,23 +39,25 @@ const transactionController = __importStar(require("./controllers/transaction.co
 const passportConfig = __importStar(require("./config/passport"));
 const sequelize_1 = __importDefault(require("./sequelize"));
 const user_model_1 = require("./models/user.model");
-const staff_model_1 = require("./models/staff.model");
-const student_model_1 = require("./models/student.model");
-const leaveRequest_model_1 = require("./models/leaveRequest.model");
 const wallet_model_1 = require("./models/wallet.model");
 const walletTransaction_model_1 = require("./models/walletTransaction.model");
 const transaction_model_1 = require("./models/transaction.model");
+const destination_model_1 = require("./models/destination.model");
+const role_model_1 = require("./models/role.model");
+const transcript_request_model_1 = require("./models/transcript-request.model");
+const user_destination_request_model_1 = require("./models/user-destination-request.model");
 // Create Express server
 const app = express_1.default();
 app.use(cors_1.default());
 // Initialize models
 user_model_1.init();
-staff_model_1.init();
-student_model_1.init();
-leaveRequest_model_1.init();
+role_model_1.init();
 wallet_model_1.init();
 walletTransaction_model_1.init();
 transaction_model_1.init();
+destination_model_1.init();
+transcript_request_model_1.init();
+user_destination_request_model_1.init();
 // Sync the database
 sequelize_1.default
     .authenticate()
@@ -92,7 +93,7 @@ const logger = winston_1.default.createLogger({
  * Primary app routes.
  */
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to Exiat application." });
+    res.json({ message: "Welcome to Transcript application." });
 });
 app.get("/users", userController.getUsers);
 app.get("/user/:id", userController.getUser);
@@ -102,13 +103,6 @@ app.post("/signup", userController.postSignup);
 app.post("/account/profile", passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
-app.post("/leave-requests", leaveRequestController.getLeaveRequests);
-app.post("/leave-request/:id", leaveRequestController.getLeaveRequest);
-app.post("/submit-request", leaveRequestController.submitLeaveRequest);
-app.post("/approve-leave-request", leaveRequestController.approveLeaveRequest);
-app.post("/reject-leave-request", leaveRequestController.rejectLeaveRequest);
-app.post("/check-in", leaveRequestController.checkInStudent);
-app.post("/check-out", leaveRequestController.checkOutStudent);
 app.post("/initialize-payment", payStackController.initializePayment);
 app.post("/verify-transaction", walletController.verifyPayment);
 app.post("/wallets", walletController.getWallets);

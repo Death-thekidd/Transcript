@@ -7,8 +7,6 @@ import { User, UserDocument } from "../models/user.model";
 import { Request, Response, NextFunction } from "express";
 import { NativeError } from "mongoose";
 import sequelize from "../sequelize";
-import { Student } from "../models/student.model";
-import { Staff } from "../models/staff.model";
 
 const LocalStrategy = passportLocal.Strategy;
 

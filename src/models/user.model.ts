@@ -1,9 +1,6 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import bcrypt from "bcrypt-nodejs";
 import sequelize from "../sequelize";
-import { Staff } from "./staff.model";
-import { Student } from "./student.model";
-import { LeaveRequest } from "./leaveRequest.model";
 import { Wallet } from "./wallet.model";
 import { WalletTransaction } from "./walletTransaction.model";
 import { Transaction } from "./transaction.model";
@@ -79,33 +76,6 @@ export const initUserModel = (sequelize: Sequelize) => {
 
 export const User = initUserModel(sequelize);
 
-User.hasOne(Staff, { foreignKey: "UserID", as: "Staff" });
-Staff.belongsTo(User, {
-	foreignKey: "UserID",
-	constraints: false,
-	as: "User",
-});
-
-User.hasOne(Student, { foreignKey: "UserID", as: "Student" });
-Student.belongsTo(User, {
-	foreignKey: "UserID",
-	constraints: false,
-	as: "User",
-});
-
-Staff.hasOne(LeaveRequest, { foreignKey: "StaffID", as: "LeaveRequest" });
-LeaveRequest.belongsTo(Staff, {
-	foreignKey: "StaffID",
-	constraints: false,
-	as: "Staff",
-});
-
-Student.hasOne(LeaveRequest, { foreignKey: "StudentID", as: "LeaveRequest" });
-LeaveRequest.belongsTo(Student, {
-	foreignKey: "StudentID",
-	constraints: false,
-	as: "Student",
-});
 
 User.hasOne(Wallet, { foreignKey: "UserID", as: "Wallet" });
 Wallet.belongsTo(User, {

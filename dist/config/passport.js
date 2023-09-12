@@ -17,8 +17,6 @@ const passport_1 = __importDefault(require("passport"));
 const passport_local_1 = __importDefault(require("passport-local"));
 // import { User, UserType } from '../models/User';
 const user_model_1 = require("../models/user.model");
-const student_model_1 = require("../models/student.model");
-const staff_model_1 = require("../models/staff.model");
 const LocalStrategy = passport_local_1.default.Strategy;
 passport_1.default.serializeUser((req, user, done) => {
     done(undefined, user);
@@ -45,16 +43,7 @@ passport_1.default.use(new LocalStrategy({ usernameField: "email" }, (email, pas
                 return done(err);
             }
             if (isMatch) {
-                if (user.userType === "Student") {
-                    const student = yield student_model_1.Student.findOne({
-                        where: { UserID: user.id },
-                    });
-                    return done(undefined, student);
-                }
-                const staff = yield staff_model_1.Staff.findOne({
-                    where: { UserID: user.id },
-                });
-                return done(undefined, staff);
+                return done(undefined, user);
             }
             return done(undefined, false, {
                 message: "Invalid email or password.",

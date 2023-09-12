@@ -9,7 +9,6 @@ import SequelizeStore from "connect-session-sequelize";
 
 // Controllers (route handlers)
 import * as userController from "./controllers/user.controller";
-import * as leaveRequestController from "./controllers/leaveRequest.controller";
 import * as payStackController from "./controllers/payStack.controller";
 import * as walletController from "./controllers/wallet.controller";
 import * as walletTransactionController from "./controllers/walletTransaction.controller";
@@ -20,12 +19,13 @@ import * as passportConfig from "./config/passport";
 
 import sequelize from "./sequelize";
 import { init as initUserModel } from "./models/user.model";
-import { init as initStaffModel } from "./models/staff.model";
-import { init as initStudentModel } from "./models/student.model";
-import { init as initLeaveRequestModel } from "./models/leaveRequest.model";
 import { init as initWalletModel } from "./models/wallet.model";
 import { init as initWalletTransactionModel } from "./models/walletTransaction.model";
 import { init as initTransactionModel } from "./models/transaction.model";
+import { init as initDestinationModel } from "./models/destination.model";
+import { init as initRoleModel } from "./models/role.model";
+import { init as initTranscriptRequestModel } from "./models/transcript-request.model";
+import { init as initUserDestinationRequestModel } from "./models/user-destination-request.model";
 
 // Create Express server
 const app = express();
@@ -34,12 +34,13 @@ app.use(cors());
 
 // Initialize models
 initUserModel();
-initStaffModel();
-initStudentModel();
-initLeaveRequestModel();
+initRoleModel();
 initWalletModel();
 initWalletTransactionModel();
 initTransactionModel();
+initDestinationModel();
+initTranscriptRequestModel();
+initUserDestinationRequestModel();
 
 // Sync the database
 sequelize
@@ -104,14 +105,6 @@ app.post(
 	passportConfig.isAuthenticated,
 	userController.postDeleteAccount
 );
-
-app.post("/leave-requests", leaveRequestController.getLeaveRequests);
-app.post("/leave-request/:id", leaveRequestController.getLeaveRequest);
-app.post("/submit-request", leaveRequestController.submitLeaveRequest);
-app.post("/approve-leave-request", leaveRequestController.approveLeaveRequest);
-app.post("/reject-leave-request", leaveRequestController.rejectLeaveRequest);
-app.post("/check-in", leaveRequestController.checkInStudent);
-app.post("/check-out", leaveRequestController.checkOutStudent);
 
 app.post("/initialize-payment", payStackController.initializePayment);
 
