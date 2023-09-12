@@ -35,6 +35,7 @@ const payStackController = __importStar(require("./controllers/payStack.controll
 const walletController = __importStar(require("./controllers/wallet.controller"));
 const walletTransactionController = __importStar(require("./controllers/walletTransaction.controller"));
 const transactionController = __importStar(require("./controllers/transaction.controller"));
+const roleController = __importStar(require("./controllers/role.controller"));
 // API keys and Passport configuration
 const passportConfig = __importStar(require("./config/passport"));
 const sequelize_1 = __importDefault(require("./sequelize"));
@@ -46,6 +47,9 @@ const destination_model_1 = require("./models/destination.model");
 const role_model_1 = require("./models/role.model");
 const transcript_request_model_1 = require("./models/transcript-request.model");
 const user_destination_request_model_1 = require("./models/user-destination-request.model");
+const college_model_1 = require("./models/college.model");
+const department_model_1 = require("./models/department.model");
+const transcript_type_model_1 = require("./models/transcript-type.model");
 // Create Express server
 const app = express_1.default();
 app.use(cors_1.default());
@@ -58,6 +62,9 @@ transaction_model_1.init();
 destination_model_1.init();
 transcript_request_model_1.init();
 user_destination_request_model_1.init();
+college_model_1.init();
+department_model_1.init();
+transcript_type_model_1.init();
 // Sync the database
 sequelize_1.default
     .authenticate()
@@ -100,6 +107,8 @@ app.get("/user/:id", userController.getUser);
 app.post("/login", userController.postLogin);
 app.post("/forgot", userController.postForgot);
 app.post("/signup", userController.postSignup);
+app.post("/create-role", roleController.createRole);
+app.get("/roles", roleController.getRoles);
 app.post("/account/profile", passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);

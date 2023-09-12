@@ -61,6 +61,18 @@ const initTranscriptRequestModel = (sequelize) => {
             type: sequelize_1.DataTypes.UUID,
             allowNull: false,
         },
+        rate: {
+            type: sequelize_1.DataTypes.FLOAT,
+            allowNull: false,
+        },
+        transcriptFee: {
+            type: sequelize_1.DataTypes.FLOAT,
+            allowNull: false,
+        },
+        total: {
+            type: sequelize_1.DataTypes.FLOAT,
+            allowNull: false,
+        }
     });
     return TranscriptRequest;
 };

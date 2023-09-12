@@ -16,6 +16,9 @@ export interface TranscriptRequestDocument {
 	userId: string;
 	isPaid: boolean;
 	destinationId: string;
+	rate: number;
+	transcriptFee: number;
+    total: number;
 }
 
 export interface TranscriptRequestInstance
@@ -65,6 +68,18 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 				type: DataTypes.UUID,
 				allowNull: false,
 			},
+			rate: {
+				type: DataTypes.FLOAT,
+				allowNull: false,
+			},
+			transcriptFee: {
+				type: DataTypes.FLOAT,
+				allowNull: false,
+			},
+            total: {
+                type: DataTypes.FLOAT,
+				allowNull: false,
+            }
 		}
 	);
 

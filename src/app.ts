@@ -13,6 +13,8 @@ import * as payStackController from "./controllers/payStack.controller";
 import * as walletController from "./controllers/wallet.controller";
 import * as walletTransactionController from "./controllers/walletTransaction.controller";
 import * as transactionController from "./controllers/transaction.controller";
+import * as roleController from "./controllers/role.controller";
+import * as transcriptRequestController from "./controllers/transcript-request.controller";
 
 // API keys and Passport configuration
 import * as passportConfig from "./config/passport";
@@ -26,6 +28,9 @@ import { init as initDestinationModel } from "./models/destination.model";
 import { init as initRoleModel } from "./models/role.model";
 import { init as initTranscriptRequestModel } from "./models/transcript-request.model";
 import { init as initUserDestinationRequestModel } from "./models/user-destination-request.model";
+import { init as initCollegeModel } from "./models/college.model";
+import { init as initDepartmentModel } from "./models/department.model";
+import { init as initTranscriptTypeModel } from "./models/transcript-type.model";
 
 // Create Express server
 const app = express();
@@ -41,6 +46,9 @@ initTransactionModel();
 initDestinationModel();
 initTranscriptRequestModel();
 initUserDestinationRequestModel();
+initCollegeModel();
+initDepartmentModel();
+initTranscriptTypeModel();
 
 // Sync the database
 sequelize
@@ -90,6 +98,10 @@ app.get("/user/:id", userController.getUser);
 app.post("/login", userController.postLogin);
 app.post("/forgot", userController.postForgot);
 app.post("/signup", userController.postSignup);
+
+app.post("/create-role", roleController.createRole);
+app.get("/roles", roleController.getRoles);
+
 app.post(
 	"/account/profile",
 	passportConfig.isAuthenticated,
