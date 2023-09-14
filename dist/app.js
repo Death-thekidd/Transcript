@@ -36,6 +36,8 @@ const walletController = __importStar(require("./controllers/wallet.controller")
 const walletTransactionController = __importStar(require("./controllers/walletTransaction.controller"));
 const transactionController = __importStar(require("./controllers/transaction.controller"));
 const roleController = __importStar(require("./controllers/role.controller"));
+const collegeController = __importStar(require("./controllers/college.controller"));
+const departmentController = __importStar(require("./controllers/department.controller"));
 // API keys and Passport configuration
 const passportConfig = __importStar(require("./config/passport"));
 const sequelize_1 = __importDefault(require("./sequelize"));
@@ -116,11 +118,17 @@ app.post("/initialize-payment", payStackController.initializePayment);
 app.post("/verify-transaction", walletController.verifyPayment);
 app.post("/wallets", walletController.getWallets);
 app.post("/wallet/:id", walletController.getWallet);
-app.post("/wallet-transactions", walletTransactionController.getWalletTransactions);
-app.post("/wallet-transaction/:id", walletTransactionController.getWalletTransaction);
-app.post("/transactions", transactionController.getTransactions);
-app.post("/transaction/:id", transactionController.getTransaction);
-app.use((err, req, res, next) => {
+app.get("/wallet-transactions", walletTransactionController.getWalletTransactions);
+app.get("/wallet-transaction/:id", walletTransactionController.getWalletTransaction);
+app.get("/transactions", transactionController.getTransactions);
+app.get("/transaction/:id", transactionController.getTransaction);
+app.get("/colleges", collegeController.getColleges);
+app.get("/college/:id", collegeController.getCollege);
+app.post("/create-college", collegeController.createCollege);
+app.get("/departments", departmentController.getDepartments);
+app.get("/department/:id", departmentController.getDepartment);
+app.post("/create-department", departmentController.createDepartment);
+app.use((err, res) => {
     if (!res.headersSent) {
         logger.error(err.message);
         res.status(err.status || 500).json({ error: err.message });

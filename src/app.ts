@@ -144,7 +144,7 @@ app.post("/create-college", collegeController.createCollege);
 
 app.get("/departments", departmentController.getDepartments);
 app.get("/department/:id", departmentController.getDepartment);
-app.post("/create-college", departmentController.createDepartment);
+app.post("/create-department", departmentController.createDepartment);
 
 app.use((err: any, res: Response) => {
 	if (!res.headersSent) {

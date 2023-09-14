@@ -39,9 +39,14 @@ const initUserModel = (sequelize) => {
         password: { type: sequelize_1.DataTypes.STRING, allowNull: false },
         email: { type: sequelize_1.DataTypes.STRING, allowNull: false, unique: true },
         name: { type: sequelize_1.DataTypes.STRING, allowNull: false },
+        department: { type: sequelize_1.DataTypes.STRING },
+        college: { type: sequelize_1.DataTypes.STRING },
+        collegeID: { type: sequelize_1.DataTypes.UUID },
+        departmentID: { type: sequelize_1.DataTypes.UUID },
         userType: { type: sequelize_1.DataTypes.STRING, allowNull: false },
         passwordResetToken: { type: sequelize_1.DataTypes.STRING },
         passwordResetExpires: { type: sequelize_1.DataTypes.DATE },
+        isAdmin: { type: sequelize_1.DataTypes.BOOLEAN },
     });
     // Password hash middleware
     User.beforeCreate((user) => __awaiter(void 0, void 0, void 0, function* () {

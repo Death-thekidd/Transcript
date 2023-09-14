@@ -26,7 +26,6 @@ const initCollegeModel = (sequelize) => {
             primaryKey: true,
         },
         name: { type: sequelize_1.DataTypes.STRING(50), allowNull: false, unique: true },
-        collegeId: { type: sequelize_1.DataTypes.UUID, allowNull: false, unique: true },
     });
     return College;
 };

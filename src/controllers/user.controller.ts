@@ -142,8 +142,16 @@ export const postSignup = async (
 		return res.status(400).json({ errors: errors.array() });
 	}
 
-	const { email, password, college, department, name, username, role } =
-		req.body;
+	const {
+		email,
+		password,
+		college,
+		department,
+		name,
+		username,
+		role,
+		userType,
+	} = req.body;
 
 	const existingUser = await User.findOne({ where: { email: req.body.email } });
 
@@ -162,14 +170,14 @@ export const postSignup = async (
 		const user = await User.create({
 			username: username,
 			name: name,
-			userType: role ? role : "user",
+			userType: userType,
 			password: password,
 			email: email,
 			department: department,
 			college: college,
 			collegeID: _college?.id,
 			departmentID: _department?.id,
-			isAdmin: role === "admin" ? true : false,
+			isAdmin: role === "Admin" ? true : false,
 		});
 		const defaultRole = await Role.findOne({
 			where: { name: role ? role : "User" },

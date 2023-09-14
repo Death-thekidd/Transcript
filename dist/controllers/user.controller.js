@@ -23,6 +23,8 @@ require("../config/passport");
 const sequelize_1 = require("sequelize");
 const sendMail_1 = __importDefault(require("../sendMail"));
 const role_model_1 = require("../models/role.model");
+const college_model_1 = require("../models/college.model");
+const department_model_1 = require("../models/department.model");
 /**
  * Get all users
  * @route GET /users
@@ -30,7 +32,7 @@ const role_model_1 = require("../models/role.model");
 const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield user_model_1.User.findAll();
-        return res.status(200).json(users);
+        return res.status(200).json({ data: users });
     }
     catch (error) {
         next(error);
@@ -118,6 +120,7 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         // Return validation errors as JSON
         return res.status(400).json({ errors: errors.array() });
     }
+    const { email, password, college, department, name, username, role, userType, } = req.body;
     const existingUser = yield user_model_1.User.findOne({ where: { email: req.body.email } });
     if (existingUser) {
         console.error("User with this email already exists");
@@ -126,23 +129,28 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             .json({ error: "Account with that email address already exists." });
     }
     try {
-        const user = yield user_model_1.User.create({
-            username: req.body.username,
-            name: req.body.name,
-            userType: req.body.userType,
-            password: req.body.password,
-            email: req.body.email,
+        const _college = yield college_model_1.College.findOne({ where: { name: college } });
+        const _department = yield department_model_1.Department.findOne({
+            where: { name: department },
         });
-        const { role } = req.body;
+        const user = yield user_model_1.User.create({
+            username: username,
+            name: name,
+            userType: userType,
+            password: password,
+            email: email,
+            department: department,
+            college: college,
+            collegeID: _college === null || _college === void 0 ? void 0 : _college.id,
+            departmentID: _department === null || _department === void 0 ? void 0 : _department.id,
+            isAdmin: role === "Admin" ? true : false,
+        });
         const defaultRole = yield role_model_1.Role.findOne({
             where: { name: role ? role : "User" },
         });
         if (defaultRole) {
             yield user.addRole(defaultRole);
         }
-        return res
-            .status(200)
-            .json({ message: "User created succesfully", data: user });
     }
     catch (error) {
         console.error("Unable to create User record : ", error);
