@@ -19,6 +19,9 @@ export interface UserDocument {
 	email: string;
 	name: string;
 	userType: UserType;
+	isAdmin: boolean;
+	departmentID: string;
+	collegeID: string;
 	passwordResetToken: string | null;
 	passwordResetExpires: Date | null;
 }
@@ -50,9 +53,12 @@ export const initUserModel = (sequelize: Sequelize) => {
 		password: { type: DataTypes.STRING, allowNull: false },
 		email: { type: DataTypes.STRING, allowNull: false, unique: true },
 		name: { type: DataTypes.STRING, allowNull: false },
+		collegeID: { type: DataTypes.UUID },
+		departmentID: { type: DataTypes.UUID },
 		userType: { type: DataTypes.STRING, allowNull: false },
 		passwordResetToken: { type: DataTypes.STRING },
 		passwordResetExpires: { type: DataTypes.DATE },
+		isAdmin: { type: DataTypes.BOOLEAN },
 	});
 
 	// Password hash middleware
@@ -75,7 +81,6 @@ export const initUserModel = (sequelize: Sequelize) => {
 };
 
 export const User = initUserModel(sequelize);
-
 
 User.hasOne(Wallet, { foreignKey: "UserID", as: "Wallet" });
 Wallet.belongsTo(User, {

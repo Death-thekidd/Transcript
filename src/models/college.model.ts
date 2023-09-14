@@ -6,7 +6,6 @@ import { Department } from "./department.model";
 export interface CollegeDocument {
 	id: string;
 	name: string;
-	collegeId: string;
 }
 
 export interface CollegeInstance
@@ -23,7 +22,6 @@ export const initCollegeModel = (sequelize: Sequelize) => {
 			primaryKey: true,
 		},
 		name: { type: DataTypes.STRING(50), allowNull: false, unique: true },
-		collegeId: { type: DataTypes.UUID, allowNull: false, unique: true },
 	});
 
 	return College;

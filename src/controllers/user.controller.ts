@@ -17,6 +17,8 @@ import { CallbackError, NativeError } from "mongoose";
 import { Op } from "sequelize";
 import sendMail from "../sendMail";
 import { Role } from "../models/role.model";
+import { College } from "../models/college.model";
+import { Department } from "../models/department.model";
 
 /**
  * Get all users
@@ -140,6 +142,9 @@ export const postSignup = async (
 		return res.status(400).json({ errors: errors.array() });
 	}
 
+	const { email, password, college, department, name, username, role } =
+		req.body;
+
 	const existingUser = await User.findOne({ where: { email: req.body.email } });
 
 	if (existingUser) {
@@ -150,14 +155,20 @@ export const postSignup = async (
 	}
 
 	try {
-		const user = await User.create({
-			username: req.body.username,
-			name: req.body.name,
-			userType: req.body.userType,
-			password: req.body.password,
-			email: req.body.email,
+		const _college = await College.findOne({ where: { name: college } });
+		const _department = await Department.findOne({
+			where: { name: department },
 		});
-		const { role } = req.body;
+		const user = await User.create({
+			username: username,
+			name: name,
+			userType: role ? role : "user",
+			password: password,
+			email: email,
+			collegeID: _college?.id,
+			departmentID: _department?.id,
+			isAdmin: role === "admin" ? true : false,
+		});
 		const defaultRole = await Role.findOne({
 			where: { name: role ? role : "User" },
 		});
@@ -165,9 +176,6 @@ export const postSignup = async (
 		if (defaultRole) {
 			await user.addRole(defaultRole);
 		}
-		return res
-			.status(200)
-			.json({ message: "User created succesfully", data: user });
 	} catch (error) {
 		console.error("Unable to create User record : ", error);
 		return res.status(500).json({ error: "Something went wrong" });
