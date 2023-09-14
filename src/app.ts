@@ -14,6 +14,8 @@ import * as walletController from "./controllers/wallet.controller";
 import * as walletTransactionController from "./controllers/walletTransaction.controller";
 import * as transactionController from "./controllers/transaction.controller";
 import * as roleController from "./controllers/role.controller";
+import * as collegeController from "./controllers/college.controller";
+import * as departmentController from "./controllers/department.controller";
 import * as transcriptRequestController from "./controllers/transcript-request.controller";
 
 // API keys and Passport configuration
@@ -124,19 +126,27 @@ app.post("/verify-transaction", walletController.verifyPayment);
 app.post("/wallets", walletController.getWallets);
 app.post("/wallet/:id", walletController.getWallet);
 
-app.post(
+app.get(
 	"/wallet-transactions",
 	walletTransactionController.getWalletTransactions
 );
-app.post(
+app.get(
 	"/wallet-transaction/:id",
 	walletTransactionController.getWalletTransaction
 );
 
-app.post("/transactions", transactionController.getTransactions);
-app.post("/transaction/:id", transactionController.getTransaction);
+app.get("/transactions", transactionController.getTransactions);
+app.get("/transaction/:id", transactionController.getTransaction);
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.get("/colleges", collegeController.getColleges);
+app.get("/college/:id", collegeController.getCollege);
+app.post("/create-college", collegeController.createCollege);
+
+app.get("/departments", departmentController.getDepartments);
+app.get("/department/:id", departmentController.getDepartment);
+app.post("/create-college", departmentController.createDepartment);
+
+app.use((err: any, res: Response) => {
 	if (!res.headersSent) {
 		logger.error(err.message);
 		res.status(err.status || 500).json({ error: err.message });

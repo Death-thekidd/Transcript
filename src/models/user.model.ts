@@ -20,6 +20,8 @@ export interface UserDocument {
 	name: string;
 	userType: UserType;
 	isAdmin: boolean;
+	department: string;
+	college: string;
 	departmentID: string;
 	collegeID: string;
 	passwordResetToken: string | null;
@@ -53,6 +55,8 @@ export const initUserModel = (sequelize: Sequelize) => {
 		password: { type: DataTypes.STRING, allowNull: false },
 		email: { type: DataTypes.STRING, allowNull: false, unique: true },
 		name: { type: DataTypes.STRING, allowNull: false },
+		department: { type: DataTypes.STRING },
+		college: { type: DataTypes.STRING },
 		collegeID: { type: DataTypes.UUID },
 		departmentID: { type: DataTypes.UUID },
 		userType: { type: DataTypes.STRING, allowNull: false },

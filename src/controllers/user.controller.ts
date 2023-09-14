@@ -31,7 +31,7 @@ export const getUsers = async (
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
 		const users = await User.findAll();
-		return res.status(200).json(users);
+		return res.status(200).json({ data: users });
 	} catch (error) {
 		next(error);
 	}
@@ -165,6 +165,8 @@ export const postSignup = async (
 			userType: role ? role : "user",
 			password: password,
 			email: email,
+			department: department,
+			college: college,
 			collegeID: _college?.id,
 			departmentID: _department?.id,
 			isAdmin: role === "admin" ? true : false,
