@@ -14,9 +14,23 @@ passport.serializeUser<any, any>((req, user, done) => {
 	done(undefined, user);
 });
 
-passport.deserializeUser(async (id: number, done) => {
-	const user = await User.findByPk(id);
-	done(undefined, user);
+passport.deserializeUser(async (userObj: Record<string, unknown>, done) => {
+	try {
+		console.log(userObj);
+
+		const user = await User.findByPk(userObj.id as number);
+
+		if (!user) {
+			// Handle the case where the user is not found
+			done(null, false);
+		} else {
+			// User found, you can proceed with authentication
+			done(null, user);
+		}
+	} catch (error) {
+		// Handle any errors that occurred during the query
+		done(error, false);
+	}
 });
 
 /**

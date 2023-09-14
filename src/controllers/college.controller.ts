@@ -2,7 +2,6 @@ import {
 	TranscriptRequest,
 	TranscriptRequestInstance,
 } from "../models/transcript-request.model";
-import { Role, RoleInstance } from "../models/role.model";
 import { check, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 import { College } from "../models/college.model";
@@ -35,7 +34,7 @@ export const getCollege = async (
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
 		const collegeId = req.params.id;
-		const college = await Role.findByPk(collegeId);
+		const college = await College.findByPk(collegeId);
 
 		if (!college) {
 			return res.status(404).json({ message: "College not found" });

@@ -103,6 +103,7 @@ app.post("/signup", userController.postSignup);
 
 app.post("/create-role", roleController.createRole);
 app.get("/roles", roleController.getRoles);
+app.get("/role/:id", roleController.getRole);
 
 app.post(
 	"/account/profile",

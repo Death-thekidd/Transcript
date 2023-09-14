@@ -111,6 +111,7 @@ app.post("/forgot", userController.postForgot);
 app.post("/signup", userController.postSignup);
 app.post("/create-role", roleController.createRole);
 app.get("/roles", roleController.getRoles);
+app.get("/role/:id", roleController.getRole);
 app.post("/account/profile", passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);

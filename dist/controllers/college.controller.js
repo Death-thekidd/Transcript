@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCollege = exports.getCollege = exports.getColleges = void 0;
-const role_model_1 = require("../models/role.model");
 const express_validator_1 = require("express-validator");
 const college_model_1 = require("../models/college.model");
 /**
@@ -34,7 +33,7 @@ exports.getColleges = getColleges;
 const getCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const collegeId = req.params.id;
-        const college = yield role_model_1.Role.findByPk(collegeId);
+        const college = yield college_model_1.College.findByPk(collegeId);
         if (!college) {
             return res.status(404).json({ message: "College not found" });
         }
