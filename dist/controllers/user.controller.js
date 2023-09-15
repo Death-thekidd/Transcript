@@ -70,7 +70,7 @@ const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         // Return validation errors as JSON
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array()[0].msg });
     }
     passport_1.default.authenticate("local", (err, user, info) => {
         if (err) {
@@ -118,7 +118,7 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     const errors = express_validator_1.validationResult(req);
     if (!errors.isEmpty()) {
         // Return validation errors as JSON
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ error: errors.array()[0].msg });
     }
     const { email, password, college, department, name, username, role, userType, } = req.body;
     const existingUser = yield user_model_1.User.findOne({ where: { email: req.body.email } });
@@ -129,27 +129,42 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             .json({ error: "Account with that email address already exists." });
     }
     try {
-        const _college = yield college_model_1.College.findOne({ where: { name: college } });
-        const _department = yield department_model_1.Department.findOne({
-            where: { name: department },
-        });
-        const user = yield user_model_1.User.create({
-            username: username,
-            name: name,
-            userType: userType,
-            password: password,
-            email: email,
-            department: department,
-            college: college,
-            collegeID: _college === null || _college === void 0 ? void 0 : _college.id,
-            departmentID: _department === null || _department === void 0 ? void 0 : _department.id,
-            isAdmin: role === "Admin" ? true : false,
-        });
+        let userMain;
+        if (role === "User") {
+            const _college = yield college_model_1.College.findOne({ where: { name: college } });
+            const _department = yield department_model_1.Department.findOne({
+                where: { name: department },
+            });
+            const user = yield user_model_1.User.create({
+                username: username,
+                name: name,
+                userType: userType,
+                password: password,
+                email: email,
+                department: department,
+                college: college,
+                collegeID: _college === null || _college === void 0 ? void 0 : _college.id,
+                departmentID: _department === null || _department === void 0 ? void 0 : _department.id,
+                isAdmin: role === "Admin" ? true : false,
+            });
+            userMain = user;
+        }
+        else {
+            const user = yield user_model_1.User.create({
+                username: username,
+                name: name,
+                userType: userType,
+                password: password,
+                email: email,
+                isAdmin: role === "Admin" ? true : false,
+            });
+            userMain = user;
+        }
         const defaultRole = yield role_model_1.Role.findOne({
             where: { name: role ? role : "User" },
         });
         if (defaultRole) {
-            yield user.addRole(defaultRole);
+            yield userMain.addRole(defaultRole);
         }
     }
     catch (error) {

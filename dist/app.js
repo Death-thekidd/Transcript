@@ -129,7 +129,7 @@ app.post("/create-college", collegeController.createCollege);
 app.get("/departments", departmentController.getDepartments);
 app.get("/department/:id", departmentController.getDepartment);
 app.post("/create-department", departmentController.createDepartment);
-app.use((err, res) => {
+app.use((err, req, res, next) => {
     if (!res.headersSent) {
         logger.error(err.message);
         res.status(err.status || 500).json({ error: err.message });

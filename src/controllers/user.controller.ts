@@ -78,7 +78,7 @@ export const postLogin = async (
 
 	if (!errors.isEmpty()) {
 		// Return validation errors as JSON
-		return res.status(400).json({ errors: errors.array() });
+		return res.status(400).json({ errors: errors.array()[0].msg });
 	}
 
 	passport.authenticate(
@@ -139,7 +139,7 @@ export const postSignup = async (
 
 	if (!errors.isEmpty()) {
 		// Return validation errors as JSON
-		return res.status(400).json({ errors: errors.array() });
+		return res.status(400).json({ error: errors.array()[0].msg });
 	}
 
 	const {
@@ -163,28 +163,42 @@ export const postSignup = async (
 	}
 
 	try {
-		const _college = await College.findOne({ where: { name: college } });
-		const _department = await Department.findOne({
-			where: { name: department },
-		});
-		const user = await User.create({
-			username: username,
-			name: name,
-			userType: userType,
-			password: password,
-			email: email,
-			department: department,
-			college: college,
-			collegeID: _college?.id,
-			departmentID: _department?.id,
-			isAdmin: role === "Admin" ? true : false,
-		});
+		let userMain;
+		if (role === "User") {
+			const _college = await College.findOne({ where: { name: college } });
+			const _department = await Department.findOne({
+				where: { name: department },
+			});
+			const user = await User.create({
+				username: username,
+				name: name,
+				userType: userType,
+				password: password,
+				email: email,
+				department: department,
+				college: college,
+				collegeID: _college?.id,
+				departmentID: _department?.id,
+				isAdmin: role === "Admin" ? true : false,
+			});
+			userMain = user;
+		} else {
+			const user = await User.create({
+				username: username,
+				name: name,
+				userType: userType,
+				password: password,
+				email: email,
+				isAdmin: role === "Admin" ? true : false,
+			});
+			userMain = user;
+		}
 		const defaultRole = await Role.findOne({
 			where: { name: role ? role : "User" },
 		});
 
 		if (defaultRole) {
-			await user.addRole(defaultRole);
+			await userMain.addRole(defaultRole);
 		}
 	} catch (error) {
 		console.error("Unable to create User record : ", error);
