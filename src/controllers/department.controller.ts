@@ -23,7 +23,7 @@ export const getDepartments = async (
 		const departmentsNew = departments.map(
 			async (department: DepartmentInstance) => {
 				const college = await College.findByPk(department.collegeId);
-				return { ...department, collegeName: college.name };
+				return { ...department.dataValues, collegeName: college.name };
 			}
 		);
 		const departmentsConsumed = await Promise.all(departmentsNew);
@@ -53,7 +53,7 @@ export const getDepartment = async (
 		const college = await College.findByPk(department.collegeId);
 		return res
 			.status(200)
-			.json({ data: { ...department, collegeName: college.name } });
+			.json({ data: { ...department.dataValues, collegeName: college.name } });
 	} catch (error) {
 		next(error);
 	}
