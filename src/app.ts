@@ -142,10 +142,15 @@ app.get("/transaction/:id", transactionController.getTransaction);
 app.get("/colleges", collegeController.getColleges);
 app.get("/college/:id", collegeController.getCollege);
 app.post("/create-college", collegeController.createCollege);
+app.patch("/edit-college/:id", collegeController.editCollege);
+app.delete("/delete-college/:id", collegeController.deleteCollege);
 
 app.get("/departments", departmentController.getDepartments);
 app.get("/department/:id", departmentController.getDepartment);
 app.post("/create-department", departmentController.createDepartment);
+
+app.patch("/edit-department/:id", departmentController.editDepartment);
+app.delete("/delete-department/:id", departmentController.deleteDepartment);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 	if (!res.headersSent) {
