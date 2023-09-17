@@ -230,7 +230,7 @@ export const postUpdateProfile = async (
 	}
 
 	try {
-		const userId = (req.user as UserDocument).id; // Assuming you have a user object in the request with an 'id' property
+		const userId = (req.body as UserDocument).id; // Assuming you have a user object in the request with an 'id' property
 		const updatedFields: any = {};
 
 		if (req.body.email) {
@@ -311,7 +311,7 @@ export const postDeleteAccount = async (
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const userId = (req.user as UserInstance).id; // Assuming you have a user object in the request with an 'id' property
+		const userId = (req.body as UserInstance).id; // Assuming you have a user object in the request with an 'id' property
 
 		const user = await User.findByPk(userId);
 

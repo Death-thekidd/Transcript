@@ -189,7 +189,7 @@ const postUpdateProfile = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         return res.status(400).json({ errors: errors.array() });
     }
     try {
-        const userId = req.user.id; // Assuming you have a user object in the request with an 'id' property
+        const userId = req.body.id; // Assuming you have a user object in the request with an 'id' property
         const updatedFields = {};
         if (req.body.email) {
             updatedFields.email = req.body.email;
@@ -252,7 +252,7 @@ exports.postUpdatePassword = postUpdatePassword;
  */
 const postDeleteAccount = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = req.user.id; // Assuming you have a user object in the request with an 'id' property
+        const userId = req.body.id; // Assuming you have a user object in the request with an 'id' property
         const user = yield user_model_1.User.findByPk(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found." });

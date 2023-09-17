@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createCollege = exports.getCollege = exports.getColleges = void 0;
+exports.deleteCollege = exports.editCollege = exports.createCollege = exports.getCollege = exports.getColleges = void 0;
 const express_validator_1 = require("express-validator");
 const college_model_1 = require("../models/college.model");
 /**
@@ -67,4 +67,53 @@ const createCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.createCollege = createCollege;
+/**
+ * Edit existing college
+ * @route PATCH /edit-college/:id
+ */
+const editCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const { name } = req.body;
+    try {
+        const college = yield college_model_1.College.findOne({ where: { id: id } });
+        if (college) {
+            // Update the record with new values
+            college.name = name;
+            // You can update multiple fields here
+            // Save the changes to the database
+            yield college.save();
+            return res.status(204).json({ message: "college updated successfully" });
+        }
+        else {
+            return res.status(404).json({ message: "college not found" });
+        }
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error editing college", error });
+    }
+});
+exports.editCollege = editCollege;
+/**
+ * Delete college
+ * @route DELETE /delete-college/:id
+ */
+const deleteCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const college = yield college_model_1.College.findOne({
+            where: { id: req.params.id },
+        });
+        if (college) {
+            // Delete the record
+            yield college.destroy();
+            return res.status(204).json({ message: "college deleted successfully." });
+        }
+        else {
+            return res.status(404).json({ message: "college not found." });
+        }
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error deleting college", error });
+    }
+});
+exports.deleteCollege = deleteCollege;
 //# sourceMappingURL=college.controller.js.map

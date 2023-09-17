@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createDepartment = exports.getDepartment = exports.getDepartments = void 0;
+exports.deleteDepartment = exports.editDepartment = exports.createDepartment = exports.getDepartment = exports.getDepartments = void 0;
 const express_validator_1 = require("express-validator");
 const department_model_1 = require("../models/department.model");
 const college_model_1 = require("../models/college.model");
@@ -20,7 +20,11 @@ const college_model_1 = require("../models/college.model");
 const getDepartments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const departments = yield department_model_1.Department.findAll();
-        return res.status(200).json({ data: departments });
+        const departmentsNew = departments.map((department) => __awaiter(void 0, void 0, void 0, function* () {
+            const college = yield college_model_1.College.findByPk(department.id);
+            return Object.assign(Object.assign({}, department), { collegeName: college.name });
+        }));
+        return res.status(200).json({ data: departmentsNew });
     }
     catch (error) {
         next(error);
@@ -72,12 +76,67 @@ const createDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, f
             collegeId: _college.id,
         });
         return res
-            .status(200)
-            .json({ message: "Role created succesfully", data: department });
+            .status(201)
+            .json({ message: "Deapartment created succesfully", data: department });
     }
     catch (error) {
         return res.status(500).json({ error: error });
     }
 });
 exports.createDepartment = createDepartment;
+/**
+ * Edit existing department
+ * @route PATCH /edit-department/:id
+ */
+const editDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const { name } = req.body;
+    try {
+        const department = yield department_model_1.Department.findOne({ where: { id: id } });
+        if (department) {
+            // Update the record with new values
+            department.name = name;
+            // You can update multiple fields here
+            // Save the changes to the database
+            yield department.save();
+            return res
+                .status(204)
+                .json({ message: "Department updated successfully" });
+        }
+        else {
+            return res.status(404).json({ message: "Department not found" });
+        }
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Error editing department", error });
+    }
+});
+exports.editDepartment = editDepartment;
+/**
+ * Delete department
+ * @route DELETE /delete-department/:id
+ */
+const deleteDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const department = yield department_model_1.Department.findOne({
+            where: { id: req.params.id },
+        });
+        if (department) {
+            // Delete the record
+            yield department.destroy();
+            return res
+                .status(204)
+                .json({ message: "Department deleted successfully." });
+        }
+        else {
+            return res.status(404).json({ message: "Department not found." });
+        }
+    }
+    catch (error) {
+        return res
+            .status(500)
+            .json({ message: "Error deleting department", error });
+    }
+});
+exports.deleteDepartment = deleteDepartment;
 //# sourceMappingURL=department.controller.js.map

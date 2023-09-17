@@ -6,7 +6,7 @@ import { Role, RoleInstance } from "../models/role.model";
 import { check, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 import async from "async";
-import { Department } from "../models/department.model";
+import { Department, DepartmentInstance } from "../models/department.model";
 import { College } from "../models/college.model";
 
 /**
@@ -20,7 +20,13 @@ export const getDepartments = async (
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
 		const departments = await Department.findAll();
-		return res.status(200).json({ data: departments });
+		const departmentsNew = departments.map(
+			async (department: DepartmentInstance) => {
+				const college = await College.findByPk(department.id);
+				return { ...department, collegeName: college.name };
+			}
+		);
+		return res.status(200).json({ data: departmentsNew });
 	} catch (error) {
 		next(error);
 	}
@@ -84,9 +90,71 @@ export const createDepartment = async (
 			collegeId: _college.id,
 		});
 		return res
-			.status(200)
-			.json({ message: "Role created succesfully", data: department });
+			.status(201)
+			.json({ message: "Deapartment created succesfully", data: department });
 	} catch (error) {
 		return res.status(500).json({ error: error });
+	}
+};
+
+/**
+ * Edit existing department
+ * @route PATCH /edit-department/:id
+ */
+export const editDepartment = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response<any, Record<string, any>>> => {
+	const id: string = req.params.id;
+	const { name } = req.body;
+	try {
+		const department = await Department.findOne({ where: { id: id } });
+
+		if (department) {
+			// Update the record with new values
+			department.name = name;
+			// You can update multiple fields here
+
+			// Save the changes to the database
+			await department.save();
+			return res
+				.status(204)
+				.json({ message: "Department updated successfully" });
+		} else {
+			return res.status(404).json({ message: "Department not found" });
+		}
+	} catch (error) {
+		return res.status(500).json({ message: "Error editing department", error });
+	}
+};
+
+/**
+ * Delete department
+ * @route DELETE /delete-department/:id
+ */
+export const deleteDepartment = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response<any, Record<string, any>>> => {
+	try {
+		const department = await Department.findOne({
+			where: { id: req.params.id },
+		});
+
+		if (department) {
+			// Delete the record
+			await department.destroy();
+			return res
+				.status(204)
+				.json({ message: "Department deleted successfully." });
+		} else {
+			return res.status(404).json({ message: "Department not found." });
+		}
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ message: "Error deleting department", error });
 	}
 };
