@@ -24,7 +24,8 @@ const getDepartments = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
             const college = yield college_model_1.College.findByPk(department.id);
             return Object.assign(Object.assign({}, department), { collegeName: college.name });
         }));
-        return res.status(200).json({ data: departmentsNew });
+        const departmentsConsumed = yield Promise.all(departmentsNew);
+        return res.status(200).json({ data: departmentsConsumed });
     }
     catch (error) {
         next(error);
@@ -42,7 +43,10 @@ const getDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         if (!department) {
             return res.status(404).json({ message: "Department not found" });
         }
-        return res.status(200).json({ data: department });
+        const college = yield college_model_1.College.findByPk(department.id);
+        return res
+            .status(200)
+            .json({ data: Object.assign(Object.assign({}, department), { collegeName: college.name }) });
     }
     catch (error) {
         next(error);

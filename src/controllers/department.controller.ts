@@ -26,7 +26,8 @@ export const getDepartments = async (
 				return { ...department, collegeName: college.name };
 			}
 		);
-		return res.status(200).json({ data: departmentsNew });
+		const departmentsConsumed = await Promise.all(departmentsNew);
+		return res.status(200).json({ data: departmentsConsumed });
 	} catch (error) {
 		next(error);
 	}
@@ -49,7 +50,10 @@ export const getDepartment = async (
 			return res.status(404).json({ message: "Department not found" });
 		}
 
-		return res.status(200).json({ data: department });
+		const college = await College.findByPk(department.id);
+		return res
+			.status(200)
+			.json({ data: { ...department, collegeName: college.name } });
 	} catch (error) {
 		next(error);
 	}
