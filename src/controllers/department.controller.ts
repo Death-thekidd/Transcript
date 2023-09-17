@@ -22,7 +22,7 @@ export const getDepartments = async (
 		const departments = await Department.findAll();
 		const departmentsNew = departments.map(
 			async (department: DepartmentInstance) => {
-				const college = await College.findByPk(department.id);
+				const college = await College.findByPk(department.collegeId);
 				return { ...department, collegeName: college.name };
 			}
 		);
@@ -50,7 +50,7 @@ export const getDepartment = async (
 			return res.status(404).json({ message: "Department not found" });
 		}
 
-		const college = await College.findByPk(department.id);
+		const college = await College.findByPk(department.collegeId);
 		return res
 			.status(200)
 			.json({ data: { ...department, collegeName: college.name } });
