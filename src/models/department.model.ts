@@ -1,6 +1,8 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import sequelize from "../sequelize";
 import { User } from "./user.model";
+import { College } from "./college.model";
+import { Destination } from "./destination.model";
 
 export interface DepartmentDocument {
 	id: string;
@@ -22,7 +24,11 @@ export const initDepartmentModel = (sequelize: Sequelize) => {
 			primaryKey: true,
 		},
 		name: { type: DataTypes.STRING(50), allowNull: false, unique: true },
-		collegeId: { type: DataTypes.UUID, allowNull: false, unique: true },
+		collegeId: {
+			type: DataTypes.UUID,
+			allowNull: false,
+			unique: false,
+		},
 	});
 
 	return Department;

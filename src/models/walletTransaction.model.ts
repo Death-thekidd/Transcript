@@ -12,7 +12,7 @@ export enum TransactionType {
 }
 
 export interface WalletTransactionDocument {
-    id: string;
+	id: string;
 	amount: number;
 	UserID: string;
 	isInFlow: boolean;

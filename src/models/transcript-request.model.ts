@@ -1,6 +1,7 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import sequelize from "../sequelize";
 import { User } from "./user.model";
+import { Destination } from "./destination.model";
 
 export enum TranscriptType {
 	LOCAL = "local",
@@ -18,7 +19,7 @@ export interface TranscriptRequestDocument {
 	destinationId: string;
 	rate: number;
 	transcriptFee: number;
-    total: number;
+	total: number;
 }
 
 export interface TranscriptRequestInstance
@@ -76,10 +77,10 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 				type: DataTypes.FLOAT,
 				allowNull: false,
 			},
-            total: {
-                type: DataTypes.FLOAT,
+			total: {
+				type: DataTypes.FLOAT,
 				allowNull: false,
-            }
+			},
 		}
 	);
 
@@ -87,6 +88,16 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 };
 
 export const TranscriptRequest = initTranscriptRequestModel(sequelize);
+
+TranscriptRequest.belongsToMany(Destination, {
+	through: "request_destinations",
+	foreignKey: "requestId",
+});
+
+Destination.belongsToMany(TranscriptRequest, {
+	through: "request_destinations",
+	foreignKey: "requestId",
+});
 
 export async function init() {
 	try {

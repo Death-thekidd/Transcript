@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.init = exports.TranscriptRequest = exports.initTranscriptRequestModel = exports.TranscriptType = void 0;
 const sequelize_1 = require("sequelize");
 const sequelize_2 = __importDefault(require("../sequelize"));
+const destination_model_1 = require("./destination.model");
 var TranscriptType;
 (function (TranscriptType) {
     TranscriptType["LOCAL"] = "local";
@@ -72,12 +73,20 @@ const initTranscriptRequestModel = (sequelize) => {
         total: {
             type: sequelize_1.DataTypes.FLOAT,
             allowNull: false,
-        }
+        },
     });
     return TranscriptRequest;
 };
 exports.initTranscriptRequestModel = initTranscriptRequestModel;
 exports.TranscriptRequest = exports.initTranscriptRequestModel(sequelize_2.default);
+exports.TranscriptRequest.belongsToMany(destination_model_1.Destination, {
+    through: "request_destinations",
+    foreignKey: "requestId",
+});
+destination_model_1.Destination.belongsToMany(exports.TranscriptRequest, {
+    through: "request_destinations",
+    foreignKey: "requestId",
+});
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
