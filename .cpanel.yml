@@ -1,4 +1,4 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/almanara/public_html/transcript-backend/
+    - export DEPLOYPATH=/home/dtkappco/public_html/transcript-backend/
     - /bin/cp -R . $DEPLOYPATH
