@@ -21,8 +21,8 @@ const getDepartments = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     try {
         const departments = yield department_model_1.Department.findAll();
         const departmentsNew = departments.map((department) => __awaiter(void 0, void 0, void 0, function* () {
-            const college = yield college_model_1.College.findByPk(department.collegeId);
-            return Object.assign(Object.assign({}, department.dataValues), { collegeName: college.name });
+            const college = yield college_model_1.College.findByPk(department === null || department === void 0 ? void 0 : department.collegeId);
+            return Object.assign(Object.assign({}, department === null || department === void 0 ? void 0 : department.dataValues), { collegeName: college === null || college === void 0 ? void 0 : college.name });
         }));
         const departmentsConsumed = yield Promise.all(departmentsNew);
         return res.status(200).json({ data: departmentsConsumed });

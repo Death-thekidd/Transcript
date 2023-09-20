@@ -22,8 +22,8 @@ export const getDepartments = async (
 		const departments = await Department.findAll();
 		const departmentsNew = departments.map(
 			async (department: DepartmentInstance) => {
-				const college = await College.findByPk(department.collegeId);
-				return { ...department.dataValues, collegeName: college.name };
+				const college = await College.findByPk(department?.collegeId);
+				return { ...department?.dataValues, collegeName: college?.name };
 			}
 		);
 		const departmentsConsumed = await Promise.all(departmentsNew);
