@@ -12,14 +12,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCollege = exports.editCollege = exports.createCollege = exports.getCollege = exports.getColleges = void 0;
 const express_validator_1 = require("express-validator");
 const college_model_1 = require("../models/college.model");
+const department_model_1 = require("../models/department.model");
 /**
  * Get all college
  * @route GET /colleges
  */
 const getColleges = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const colleges = yield college_model_1.College.findAll();
-        return res.status(200).json({ data: colleges });
+        const colleges = yield college_model_1.College.findAll({
+            include: department_model_1.Department,
+        });
+        const collegeData = colleges.map((college) => {
+            const departments = college.Departments
+                ? college.Departments.map((department) => department.name)
+                : [];
+            return {
+                name: college.name,
+                departments,
+            };
+        });
+        return res.status(200).json({ data: collegeData });
     }
     catch (error) {
         next(error);

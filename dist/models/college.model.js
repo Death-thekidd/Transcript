@@ -31,13 +31,13 @@ const initCollegeModel = (sequelize) => {
 };
 exports.initCollegeModel = initCollegeModel;
 exports.College = exports.initCollegeModel(sequelize_2.default);
-exports.College.belongsToMany(department_model_1.Department, {
-    through: "college_departments",
+exports.College.hasMany(department_model_1.Department, {
     foreignKey: "collegeId",
+    onDelete: "CASCADE",
 });
-department_model_1.Department.belongsToMany(exports.College, {
-    through: "college_departments",
-    foreignKey: "departmentId",
+department_model_1.Department.belongsTo(exports.College, {
+    foreignKey: "collegeId",
+    onDelete: "CASCADE",
 });
 function init() {
     return __awaiter(this, void 0, void 0, function* () {

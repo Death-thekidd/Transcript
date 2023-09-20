@@ -1,7 +1,7 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import sequelize from "../sequelize";
 import { User } from "./user.model";
-import { Department } from "./department.model";
+import { Department, DepartmentInstance } from "./department.model";
 
 export interface CollegeDocument {
 	id: string;
@@ -10,7 +10,9 @@ export interface CollegeDocument {
 
 export interface CollegeInstance
 	extends Model<CollegeDocument>,
-		CollegeDocument {}
+		CollegeDocument {
+	Departments: DepartmentInstance[];
+}
 
 export const initCollegeModel = (sequelize: Sequelize) => {
 	const College = sequelize.define<CollegeInstance>("College", {
@@ -29,14 +31,14 @@ export const initCollegeModel = (sequelize: Sequelize) => {
 
 export const College = initCollegeModel(sequelize);
 
-College.belongsToMany(Department, {
-	through: "college_departments",
+College.hasMany(Department, {
 	foreignKey: "collegeId",
+	onDelete: "CASCADE",
 });
 
-Department.belongsToMany(College, {
-	through: "college_departments",
-	foreignKey: "departmentId",
+Department.belongsTo(College, {
+	foreignKey: "collegeId",
+	onDelete: "CASCADE",
 });
 
 export async function init() {

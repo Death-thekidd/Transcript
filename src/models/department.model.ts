@@ -12,7 +12,9 @@ export interface DepartmentDocument {
 
 export interface DepartmentInstance
 	extends Model<DepartmentDocument>,
-		DepartmentDocument {}
+		DepartmentDocument {
+	
+}
 
 export const initDepartmentModel = (sequelize: Sequelize) => {
 	const Department = sequelize.define<DepartmentInstance>("Department", {

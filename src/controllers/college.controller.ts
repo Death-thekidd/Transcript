@@ -5,6 +5,7 @@ import {
 import { check, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 import { College } from "../models/college.model";
+import { Department, DepartmentInstance } from "../models/department.model";
 
 /**
  * Get all college
@@ -16,8 +17,20 @@ export const getColleges = async (
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const colleges = await College.findAll();
-		return res.status(200).json({ data: colleges });
+		const colleges = await College.findAll({
+			include: Department,
+		});
+		const collegeData = colleges.map((college) => {
+			const departments = college.Departments
+				? college.Departments.map((department) => department.name)
+				: [];
+			return {
+				name: college.name,
+				departments,
+			};
+		});
+
+		return res.status(200).json({ data: collegeData });
 	} catch (error) {
 		next(error);
 	}
