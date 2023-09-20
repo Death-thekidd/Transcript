@@ -27,6 +27,7 @@ const getColleges = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
                 ? college.Departments.map((department) => department.name)
                 : [];
             return {
+                id: college.id,
                 name: college.name,
                 departments,
             };

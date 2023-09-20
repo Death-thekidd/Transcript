@@ -25,6 +25,7 @@ export const getColleges = async (
 				? college.Departments.map((department) => department.name)
 				: [];
 			return {
+				id: college.id,
 				name: college.name,
 				departments,
 			};
