@@ -137,3 +137,27 @@ export const submitTranscriptRequest = async (
 		return res.status(500).json({ error: error });
 	}
 };
+/**
+ * Generate Transcript request PDF
+ * @route GET /generate-transcript-request-pdf/:id
+ */
+export const generateTranscriptRequestPdf = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response<any, Record<string, any>>> => {
+	try {
+		const transcriptRequestId = req.params.id;
+		const transcriptRequest = await TranscriptRequest.findByPk(
+			transcriptRequestId
+		);
+
+		if (!transcriptRequest) {
+			return res.status(404).json({ message: "Transcript Request not found" });
+		}
+
+		return res.status(200).json({ data: transcriptRequest });
+	} catch (error) {
+		next(error);
+	}
+};

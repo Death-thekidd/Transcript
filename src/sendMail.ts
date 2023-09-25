@@ -18,13 +18,17 @@ const createTransporter = async () => {
 async function sendMail(
 	to: string[],
 	subject: string,
-	text: string
+	html: string,
+	text: string,
+	attachment: any
 ): Promise<void> {
 	const mailOptions = {
 		from: SENDER_EMAIL, // sender address
 		to: to, // list of receivers
 		subject: subject, // Subject line
-		text: text, // plain text body
+		html: html, // plain text body
+		text: text,
+		attachments: [attachment],
 	};
 
 	console.log(mailOptions);

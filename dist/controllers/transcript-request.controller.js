@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.submitTranscriptRequest = exports.getTranscriptRequest = exports.getTranscriptRequests = void 0;
+exports.generateTranscriptRequestPdf = exports.submitTranscriptRequest = exports.getTranscriptRequest = exports.getTranscriptRequests = void 0;
 const transcript_request_model_1 = require("../models/transcript-request.model");
 const user_model_1 = require("../models/user.model");
 const express_validator_1 = require("express-validator");
@@ -122,4 +122,22 @@ const submitTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, vo
     }
 });
 exports.submitTranscriptRequest = submitTranscriptRequest;
+/**
+ * Generate Transcript request PDF
+ * @route GET /generate-transcript-request-pdf/:id
+ */
+const generateTranscriptRequestPdf = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const transcriptRequestId = req.params.id;
+        const transcriptRequest = yield transcript_request_model_1.TranscriptRequest.findByPk(transcriptRequestId);
+        if (!transcriptRequest) {
+            return res.status(404).json({ message: "Transcript Request not found" });
+        }
+        return res.status(200).json({ data: transcriptRequest });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.generateTranscriptRequestPdf = generateTranscriptRequestPdf;
 //# sourceMappingURL=transcript-request.controller.js.map

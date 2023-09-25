@@ -7,6 +7,48 @@ import { UserDestinationRequest } from "../models/user-destination-request.model
 import { where } from "sequelize";
 
 /**
+ * Get all destinations
+ * @route GET /destination-requests
+ */
+export const getDestinationRequests = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response<any, Record<string, any>>> => {
+	try {
+		const destinationRequests = await UserDestinationRequest.findAll();
+		return res.status(200).json({ data: destinationRequests });
+	} catch (error) {
+		next(error);
+	}
+};
+
+/**
+ * Get destination by id
+ * @route GET /destination-request/:id
+ */
+export const getDestinationRequest = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response<any, Record<string, any>>> => {
+	try {
+		const destinationRequestId = req.params.id;
+		const destinationRequest = await UserDestinationRequest.findByPk(
+			destinationRequestId
+		);
+
+		if (!destinationRequest) {
+			return res.status(404).json({ message: "Destination Request not found" });
+		}
+
+		return res.status(200).json({ data: destinationRequest });
+	} catch (error) {
+		next(error);
+	}
+};
+
+/**
  * Create Destination request
  * @route POST /submit-destination-request
  */

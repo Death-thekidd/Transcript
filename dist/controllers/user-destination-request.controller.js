@@ -12,11 +12,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.acceptDestinationRequest = exports.submitDestinationRequest = void 0;
+exports.acceptDestinationRequest = exports.submitDestinationRequest = exports.getDestinationRequest = exports.getDestinationRequests = void 0;
 const user_model_1 = require("../models/user.model");
 const express_validator_1 = require("express-validator");
 const async_1 = __importDefault(require("async"));
 const user_destination_request_model_1 = require("../models/user-destination-request.model");
+/**
+ * Get all destinations
+ * @route GET /destination-requests
+ */
+const getDestinationRequests = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const destinationRequests = yield user_destination_request_model_1.UserDestinationRequest.findAll();
+        return res.status(200).json({ data: destinationRequests });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getDestinationRequests = getDestinationRequests;
+/**
+ * Get destination by id
+ * @route GET /destination-request/:id
+ */
+const getDestinationRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const destinationRequestId = req.params.id;
+        const destinationRequest = yield user_destination_request_model_1.UserDestinationRequest.findByPk(destinationRequestId);
+        if (!destinationRequest) {
+            return res.status(404).json({ message: "Destination Request not found" });
+        }
+        return res.status(200).json({ data: destinationRequest });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getDestinationRequest = getDestinationRequest;
 /**
  * Create Destination request
  * @route POST /submit-destination-request

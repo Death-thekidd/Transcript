@@ -26,13 +26,15 @@ const createTransporter = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     return transporter;
 });
-function sendMail(to, subject, text) {
+function sendMail(to, subject, html, text, attachment) {
     return __awaiter(this, void 0, void 0, function* () {
         const mailOptions = {
             from: secrets_1.SENDER_EMAIL,
             to: to,
             subject: subject,
-            text: text, // plain text body
+            html: html,
+            text: text,
+            attachments: [attachment],
         };
         console.log(mailOptions);
         try {
