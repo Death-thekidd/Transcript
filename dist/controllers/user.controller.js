@@ -95,7 +95,7 @@ const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 exports.postLogin = postLogin;
 /**
  * Log out.
- * @route GET /logout
+ * @route POST /logout
  */
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     req.logout();

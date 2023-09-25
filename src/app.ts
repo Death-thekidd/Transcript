@@ -101,6 +101,7 @@ app.get("/", (req: Request, res: Response) => {
 app.get("/users", userController.getUsers);
 app.get("/user/:id", userController.getUser);
 app.post("/login", userController.postLogin);
+app.post("/logout", userController.logout);
 app.post("/forgot", userController.postForgot);
 app.post("/signup", userController.postSignup);
 

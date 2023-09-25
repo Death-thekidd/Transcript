@@ -107,7 +107,7 @@ export const postLogin = async (
 
 /**
  * Log out.
- * @route GET /logout
+ * @route POST /logout
  */
 export const logout = async (
 	req: Request,
