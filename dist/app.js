@@ -58,7 +58,7 @@ const department_model_1 = require("./models/department.model");
 const transcript_type_model_1 = require("./models/transcript-type.model");
 // Create Express server
 const app = express_1.default();
-app.use(cors_1.default());
+app.use(cors_1.default({ origin: "*", credentials: true }));
 // Initialize models
 user_model_1.init();
 role_model_1.init();
