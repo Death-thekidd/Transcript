@@ -3,8 +3,9 @@ import { SENDER_EMAIL, SENDER_PASS } from "./util/secrets";
 
 const createTransporter = async () => {
 	const transporter = nodemailer.createTransport({
-		host: "smtp-relay.sendinblue.com",
+		host: "mail.dtkapp.com.ng",
 		port: 465,
+		secure: true,
 		auth: {
 			user: SENDER_EMAIL,
 			pass: SENDER_PASS,
@@ -14,7 +15,11 @@ const createTransporter = async () => {
 	return transporter;
 };
 
-async function sendMail(to: string[], subject: string, text: string) {
+async function sendMail(
+	to: string[],
+	subject: string,
+	text: string
+): Promise<void> {
 	const mailOptions = {
 		from: SENDER_EMAIL, // sender address
 		to: to, // list of receivers

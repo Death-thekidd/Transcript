@@ -148,7 +148,7 @@ export const postSignup = async (
 		college,
 		department,
 		name,
-		username,
+		schoolId,
 		role,
 		userType,
 	} = req.body;
@@ -170,7 +170,7 @@ export const postSignup = async (
 				where: { name: department },
 			});
 			const user = await User.create({
-				username: username,
+				schoolId: schoolId,
 				name: name,
 				userType: userType,
 				password: password,
@@ -184,7 +184,7 @@ export const postSignup = async (
 			userMain = user;
 		} else {
 			const user = await User.create({
-				username: username,
+				schoolId: schoolId,
 				name: name,
 				userType: userType,
 				password: password,
@@ -200,6 +200,55 @@ export const postSignup = async (
 		if (defaultRole) {
 			await userMain.addRole(defaultRole);
 		}
+		sendMail(
+			[userMain.email],
+			"SIGN UP SUCCESFULL",
+			`<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>School Email</title>
+		</head>
+		<body>
+			<!-- School Logo Header -->	
+			<div style="text-align: center;">
+				<img src="school_logo.png" alt="School Logo" style="max-width: 100%; height: auto;">
+			</div>
+		
+			<!-- Email Content -->
+			<div style="padding: 20px;">
+				<h1>Welcome to Our School!</h1>
+				<p>
+					Dear [Recipient's Name],
+				</p>
+				<p>
+					We are excited to have you as part of our school community. Here is some important information:
+				</p>
+				<ul>
+					<li>Class schedules</li>
+					<li>Upcoming events</li>
+					<li>Contact information</li>
+					<!-- Add more content as needed -->
+				</ul>
+				<p>
+					If you have any questions or need assistance, please feel free to contact us at [Contact Email].
+				</p>
+				<p>
+					We look forward to a successful academic year together!
+				</p>
+				<p>
+					Sincerely,
+					<br>
+					[Your Name]
+					<br>
+					[School Name]
+				</p>
+			</div>
+		</body>
+		</html>
+		`
+		);
 	} catch (error) {
 		console.error("Unable to create User record : ", error);
 		return res.status(500).json({ error: "Something went wrong" });

@@ -25,8 +25,8 @@ const initDestinationModel = (sequelize) => {
             primaryKey: true,
         },
         name: { type: sequelize_1.DataTypes.STRING(50), allowNull: false, unique: true },
-        deliveryMethod: { type: sequelize_1.DataTypes.STRING(50), allowNull: false },
-        rate: { type: sequelize_1.DataTypes.FLOAT, allowNull: false },
+        deliveryMethod: { type: sequelize_1.DataTypes.STRING(50) },
+        rate: { type: sequelize_1.DataTypes.FLOAT },
     });
     return Destination;
 };

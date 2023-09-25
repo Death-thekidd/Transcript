@@ -65,7 +65,7 @@ const submitTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, vo
         async_1.default.waterfall([
             function checkUser(done) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const user = yield user_model_1.User.findByPk(req.body.id);
+                    const user = yield user_model_1.User.findByPk(req.body.userId);
                     if (!user) {
                         return done(new Error("User not found."), null); // Pass an error to the next function
                     }
@@ -75,30 +75,30 @@ const submitTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, vo
             function saveRequest(user, done) {
                 return __awaiter(this, void 0, void 0, function* () {
                     try {
-                        const { faculty, department, transcriptType, userId, deliveryMethod, destination, } = req.body;
-                        const _destination = yield destination_model_1.Destination.findOne({
-                            where: {
-                                deliveryMethod: deliveryMethod,
-                                name: destination,
-                            },
-                        });
+                        const { transcriptType, userId, destinations } = req.body;
                         const _transcriptType = yield transcript_type_model_1.TranscriptType.findOne({
                             where: {
                                 name: transcriptType,
                             },
                         });
                         const request = yield transcript_request_model_1.TranscriptRequest.create({
-                            faculty: faculty,
-                            department: department,
+                            college: user.college,
+                            department: user.department,
+                            matricNo: user.schoolId,
                             transcriptType: transcriptType,
+                            status: "pending",
                             userId: userId,
-                            deliveryMethod: deliveryMethod,
-                            destination: destination,
-                            destinationId: _destination.id,
-                            rate: _destination.rate,
-                            transcriptFee: _transcriptType.amount,
-                            total: _destination.rate + _transcriptType.amount,
                         });
+                        const transcriptRequest = yield transcript_request_model_1.TranscriptRequest.findByPk(request.id, {
+                            include: destination_model_1.Destination,
+                        });
+                        for (const { name, deliveryMethod } of destinations) {
+                            const destination = yield destination_model_1.Destination.findOne({
+                                where: { name: name, deliveryMethod: deliveryMethod },
+                            });
+                            yield transcriptRequest.addDestination(destination);
+                        }
+                        transcriptRequest.addTranscriptType(_transcriptType);
                         done(null, request, user);
                     }
                     catch (error) {

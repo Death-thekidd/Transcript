@@ -16,8 +16,9 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const secrets_1 = require("./util/secrets");
 const createTransporter = () => __awaiter(void 0, void 0, void 0, function* () {
     const transporter = nodemailer_1.default.createTransport({
-        host: "smtp-relay.sendinblue.com",
+        host: "mail.dtkapp.com.ng",
         port: 465,
+        secure: true,
         auth: {
             user: secrets_1.SENDER_EMAIL,
             pass: secrets_1.SENDER_PASS,

@@ -38,6 +38,10 @@ const transactionController = __importStar(require("./controllers/transaction.co
 const roleController = __importStar(require("./controllers/role.controller"));
 const collegeController = __importStar(require("./controllers/college.controller"));
 const departmentController = __importStar(require("./controllers/department.controller"));
+const destinationController = __importStar(require("./controllers/destination.controller"));
+const transcriptRequestController = __importStar(require("./controllers/transcript-request.controller"));
+const transcriptTypeController = __importStar(require("./controllers/transcript-type.controller"));
+const userDestinationRequestController = __importStar(require("./controllers/user-destination-request.controller"));
 // API keys and Passport configuration
 const passportConfig = __importStar(require("./config/passport"));
 const sequelize_1 = __importDefault(require("./sequelize"));
@@ -133,6 +137,21 @@ app.get("/department/:id", departmentController.getDepartment);
 app.post("/create-department", departmentController.createDepartment);
 app.patch("/edit-department/:id", departmentController.editDepartment);
 app.delete("/delete-department/:id", departmentController.deleteDepartment);
+app.get("/destinations", destinationController.getDestinations);
+app.get("/destination/:id", destinationController.getDestination);
+app.post("/create-destination", destinationController.createDestination);
+app.patch("/edit-destination/:id", destinationController.editDestination);
+app.delete("/delete-destination/:id", destinationController.deleteDestination);
+app.get("/transcript-types", transcriptTypeController.getTranscriptTypes);
+app.get("/transcript-type/:id", transcriptTypeController.getTranscriptType);
+app.post("/create-transcript-type", transcriptTypeController.createTranscriptType);
+app.patch("/edit-transcript-type/:id", transcriptTypeController.editTranscriptType);
+app.delete("/delete-transcript-type/:id", transcriptTypeController.deleteTranscriptType);
+app.get("/transcript-requests", transcriptRequestController.getTranscriptRequests);
+app.get("/transcript-request/:id", transcriptRequestController.getTranscriptRequest);
+app.post("/submit-request", transcriptRequestController.submitTranscriptRequest);
+app.post("/submit-destination-request", userDestinationRequestController.submitDestinationRequest);
+app.patch("/accept-destination-request/:id", userDestinationRequestController.acceptDestinationRequest);
 app.use((err, req, res, next) => {
     if (!res.headersSent) {
         logger.error(err.message);

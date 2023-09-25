@@ -25,8 +25,8 @@ const initUserDestinationRequestModel = (sequelize) => {
             primaryKey: true,
         },
         name: { type: sequelize_1.DataTypes.STRING(50), allowNull: false, unique: true },
-        deliveryMethod: { type: sequelize_1.DataTypes.STRING(50), allowNull: false },
-        rate: { type: sequelize_1.DataTypes.FLOAT, allowNull: false },
+        userId: { type: sequelize_1.DataTypes.UUID, allowNull: false },
+        status: { type: sequelize_1.DataTypes.ENUM("pending", "accepted") },
     });
     return UserDestinationRequest;
 };

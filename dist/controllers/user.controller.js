@@ -120,7 +120,7 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         // Return validation errors as JSON
         return res.status(400).json({ error: errors.array()[0].msg });
     }
-    const { email, password, college, department, name, username, role, userType, } = req.body;
+    const { email, password, college, department, name, schoolId, role, userType, } = req.body;
     const existingUser = yield user_model_1.User.findOne({ where: { email: req.body.email } });
     if (existingUser) {
         console.error("User with this email already exists");
@@ -136,7 +136,7 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 where: { name: department },
             });
             const user = yield user_model_1.User.create({
-                username: username,
+                schoolId: schoolId,
                 name: name,
                 userType: userType,
                 password: password,
@@ -151,7 +151,7 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         }
         else {
             const user = yield user_model_1.User.create({
-                username: username,
+                schoolId: schoolId,
                 name: name,
                 userType: userType,
                 password: password,
@@ -166,6 +166,51 @@ const postSignup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (defaultRole) {
             yield userMain.addRole(defaultRole);
         }
+        sendMail_1.default([userMain.email], "SIGN UP SUCCESFULL", `<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>School Email</title>
+		</head>
+		<body>
+			<!-- School Logo Header -->	
+			<div style="text-align: center;">
+				<img src="school_logo.png" alt="School Logo" style="max-width: 100%; height: auto;">
+			</div>
+		
+			<!-- Email Content -->
+			<div style="padding: 20px;">
+				<h1>Welcome to Our School!</h1>
+				<p>
+					Dear [Recipient's Name],
+				</p>
+				<p>
+					We are excited to have you as part of our school community. Here is some important information:
+				</p>
+				<ul>
+					<li>Class schedules</li>
+					<li>Upcoming events</li>
+					<li>Contact information</li>
+					<!-- Add more content as needed -->
+				</ul>
+				<p>
+					If you have any questions or need assistance, please feel free to contact us at [Contact Email].
+				</p>
+				<p>
+					We look forward to a successful academic year together!
+				</p>
+				<p>
+					Sincerely,
+					<br>
+					[Your Name]
+					<br>
+					[School Name]
+				</p>
+			</div>
+		</body>
+		</html>
+		`);
     }
     catch (error) {
         console.error("Unable to create User record : ", error);

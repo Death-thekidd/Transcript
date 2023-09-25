@@ -5,8 +5,8 @@ import { User } from "./user.model";
 export interface UserDestinationRequestDocument {
 	id: string;
 	name: string;
-	deliveryMethod: string;
-	rate: number;
+	userId: string;
+	status: string;
 }
 
 export interface UserDestinationRequestInstance
@@ -24,8 +24,8 @@ export const initUserDestinationRequestModel = (sequelize: Sequelize) => {
 				primaryKey: true,
 			},
 			name: { type: DataTypes.STRING(50), allowNull: false, unique: true },
-			deliveryMethod: { type: DataTypes.STRING(50), allowNull: false },
-			rate: { type: DataTypes.FLOAT, allowNull: false },
+			userId: { type: DataTypes.UUID, allowNull: false },
+			status: { type: DataTypes.ENUM("pending", "accepted") },
 		});
 
 	return UserDestinationRequest;

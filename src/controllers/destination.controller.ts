@@ -1,14 +1,11 @@
-import {
-	TranscriptRequest,
-	TranscriptRequestInstance,
-} from "../models/transcript-request.model";
-import { check, validationResult } from "express-validator";
+import { validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 import { College } from "../models/college.model";
+import { Destination } from "../models/destination.model";
 
 /**
- * Get all college
- * @route GET /colleges
+ * Get all destinations
+ * @route GET /destinations
  */
 export const getDestinations = async (
 	req: Request,
@@ -16,41 +13,41 @@ export const getDestinations = async (
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const colleges = await College.findAll();
-		return res.status(200).json({ data: colleges });
+		const destinations = await Destination.findAll();
+		return res.status(200).json({ data: destinations });
 	} catch (error) {
 		next(error);
 	}
 };
 
 /**
- * Get college by ID
- * @route GET /college/:id
+ * Get destination by ID
+ * @route GET /destination/:id
  */
-export const getCollege = async (
+export const getDestination = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const collegeId = req.params.id;
-		const college = await College.findByPk(collegeId);
+		const destinationId = req.params.id;
+		const destination = await Destination.findByPk(destinationId);
 
-		if (!college) {
-			return res.status(404).json({ message: "College not found" });
+		if (!destination) {
+			return res.status(404).json({ message: "Destination not found" });
 		}
 
-		return res.status(200).json({ data: college });
+		return res.status(200).json({ data: destination });
 	} catch (error) {
 		next(error);
 	}
 };
 
 /**
- * Create new College
- * @route POST /create-college
+ * Create new Destination
+ * @route POST /create-destination
  */
-export const createCollege = async (
+export const createDestination = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
@@ -63,52 +60,51 @@ export const createCollege = async (
 			return res.status(400).json({ errors: errors.array() });
 		}
 
-		const college = await College.create({
+		const destination = await Destination.create({
 			name: req.body.name,
+			rate: req.body.rate,
+			deliveryMethod: req.body.deliveryMethod,
 		});
 		return res
 			.status(200)
-			.json({ message: "College created succesfully", data: college });
+			.json({ message: "College created succesfully", data: destination });
 	} catch (error) {
 		return res.status(500).json({ error: error });
 	}
 };
 
 /**
- * Edit existing college
- * @route PATCH /edit-college/:id
+ * Edit existing destination
+ * @route PATCH /edit-destination/:id
  */
-export const editCollege = async (
+export const editDestination = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	const id: string = req.params.id;
-	const { name } = req.body;
 	try {
-		const college = await College.findOne({ where: { id: id } });
+		const result = await Destination.update(
+			{ ...req.body },
+			{ where: { id: id } }
+		);
 
-		if (college) {
-			// Update the record with new values
-			college.name = name;
-			// You can update multiple fields here
-
-			// Save the changes to the database
-			await college.save();
-			return res.status(204).json({ message: "college updated successfully" });
-		} else {
+		if (result[0] === 0) {
 			return res.status(404).json({ message: "college not found" });
 		}
+		return res
+			.status(204)
+			.json({ message: "destination updated successfully" });
 	} catch (error) {
 		return res.status(500).json({ message: "Error editing college", error });
 	}
 };
 
 /**
- * Delete college
- * @route DELETE /delete-college/:id
+ * Delete destination
+ * @route DELETE /delete-destination/:id
  */
-export const deleteCollege = async (
+export const deleteDestination = async (
 	req: Request,
 	res: Response,
 	next: NextFunction

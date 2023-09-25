@@ -14,7 +14,7 @@ export enum UserType {
 
 export interface UserDocument {
 	id?: string;
-	username: string;
+	schoolId: string;
 	password: string;
 	email: string;
 	name: string;
@@ -51,7 +51,7 @@ export const initUserModel = (sequelize: Sequelize) => {
 			autoIncrement: false,
 			primaryKey: true,
 		},
-		username: { type: DataTypes.STRING, allowNull: false },
+		schoolId: { type: DataTypes.STRING, allowNull: false },
 		password: { type: DataTypes.STRING, allowNull: false },
 		email: { type: DataTypes.STRING, allowNull: false, unique: true },
 		name: { type: DataTypes.STRING, allowNull: false },

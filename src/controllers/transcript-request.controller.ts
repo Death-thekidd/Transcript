@@ -6,9 +6,6 @@ import { User, UserInstance } from "../models/user.model";
 import { check, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 import async from "async";
-import { Wallet, WalletInstance } from "../models/wallet.model";
-import { createWalletTransaction } from "./wallet.controller";
-import { CurrencyType } from "../models/walletTransaction.model";
 import { Destination } from "../models/destination.model";
 import { TranscriptType } from "../models/transcript-type.model";
 
@@ -76,7 +73,7 @@ export const submitTranscriptRequest = async (
 				async function checkUser(
 					done: (err: Error, user: UserInstance) => void
 				) {
-					const user = await User.findByPk(req.body.id);
+					const user = await User.findByPk(req.body.userId);
 					if (!user) {
 						return done(new Error("User not found."), null); // Pass an error to the next function
 					}
@@ -91,37 +88,33 @@ export const submitTranscriptRequest = async (
 					) => void
 				) {
 					try {
-						const {
-							faculty,
-							department,
-							transcriptType,
-							userId,
-							deliveryMethod,
-							destination,
-						} = req.body;
-						const _destination = await Destination.findOne({
-							where: {
-								deliveryMethod: deliveryMethod,
-								name: destination,
-							},
-						});
+						const { transcriptType, userId, destinations } = req.body;
 						const _transcriptType = await TranscriptType.findOne({
 							where: {
 								name: transcriptType,
 							},
 						});
 						const request = await TranscriptRequest.create({
-							faculty: faculty,
-							department: department,
+							college: user.college,
+							department: user.department,
+							matricNo: user.schoolId,
 							transcriptType: transcriptType,
+							status: "pending",
 							userId: userId,
-							deliveryMethod: deliveryMethod,
-							destination: destination,
-							destinationId: _destination.id,
-							rate: _destination.rate,
-							transcriptFee: _transcriptType.amount,
-							total: _destination.rate + _transcriptType.amount,
 						});
+						const transcriptRequest = await TranscriptRequest.findByPk(
+							request.id,
+							{
+								include: Destination,
+							}
+						);
+						for (const { name, deliveryMethod } of destinations) {
+							const destination = await Destination.findOne({
+								where: { name: name, deliveryMethod: deliveryMethod },
+							});
+							await transcriptRequest.addDestination(destination);
+						}
+						transcriptRequest.addTranscriptType(_transcriptType);
 						done(null, request, user);
 					} catch (error) {
 						console.error("Unable to create Leave request : ", error);

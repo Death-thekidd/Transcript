@@ -1,30 +1,34 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import sequelize from "../sequelize";
 import { User } from "./user.model";
-import { Destination } from "./destination.model";
+import { Destination, DestinationInstance } from "./destination.model";
+import {
+	TranscriptType,
+	TranscriptTypeInstance,
+} from "./transcript-type.model";
 
-export enum TranscriptType {
+export enum TranscriptTypeEnum {
 	LOCAL = "local",
 	STAFF = "staff",
 }
 export interface TranscriptRequestDocument {
 	id: string;
-	faculty: string;
+	college: string;
 	department: string;
-	transcriptType: TranscriptType;
-	deliveryMethod: string;
-	destination: string;
+	transcriptType: TranscriptTypeEnum;
+	status: string;
+	matricNo: string;
 	userId: string;
 	isPaid: boolean;
-	destinationId: string;
-	rate: number;
-	transcriptFee: number;
 	total: number;
 }
 
 export interface TranscriptRequestInstance
 	extends Model<TranscriptRequestDocument>,
-		Document {}
+		TranscriptRequestDocument {
+	addDestination: (destination: DestinationInstance) => Promise<void>;
+	addTranscriptType: (transcriptType: TranscriptTypeInstance) => Promise<void>;
+}
 
 export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 	const TranscriptRequest = sequelize.define<TranscriptRequestInstance>(
@@ -37,7 +41,11 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 				autoIncrement: false,
 				primaryKey: true,
 			},
-			faculty: {
+			matricNo: {
+				type: DataTypes.STRING(100),
+				allowNull: false,
+			},
+			college: {
 				type: DataTypes.STRING(100),
 				allowNull: false,
 			},
@@ -49,12 +57,8 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 				type: DataTypes.ENUM("local", "international"),
 				allowNull: false,
 			},
-			deliveryMethod: {
-				type: DataTypes.STRING(50),
-				allowNull: false,
-			},
-			destination: {
-				type: DataTypes.STRING(100),
+			status: {
+				type: DataTypes.ENUM("pending", "accepted"),
 				allowNull: false,
 			},
 			userId: {
@@ -64,18 +68,6 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 			isPaid: {
 				type: DataTypes.BOOLEAN,
 				defaultValue: false,
-			},
-			destinationId: {
-				type: DataTypes.UUID,
-				allowNull: false,
-			},
-			rate: {
-				type: DataTypes.FLOAT,
-				allowNull: false,
-			},
-			transcriptFee: {
-				type: DataTypes.FLOAT,
-				allowNull: false,
 			},
 			total: {
 				type: DataTypes.FLOAT,
@@ -90,14 +82,15 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 export const TranscriptRequest = initTranscriptRequestModel(sequelize);
 
 TranscriptRequest.belongsToMany(Destination, {
-	through: "request_destinations",
-	foreignKey: "requestId",
+	through: "TranscriptRequestDestination",
 });
 
 Destination.belongsToMany(TranscriptRequest, {
-	through: "request_destinations",
-	foreignKey: "requestId",
+	through: "TranscriptRequestDestination",
 });
+
+TranscriptRequest.hasOne(TranscriptType, {});
+TranscriptType.belongsTo(TranscriptRequest, {});
 
 export async function init() {
 	try {

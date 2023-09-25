@@ -16,7 +16,10 @@ import * as transactionController from "./controllers/transaction.controller";
 import * as roleController from "./controllers/role.controller";
 import * as collegeController from "./controllers/college.controller";
 import * as departmentController from "./controllers/department.controller";
+import * as destinationController from "./controllers/destination.controller";
 import * as transcriptRequestController from "./controllers/transcript-request.controller";
+import * as transcriptTypeController from "./controllers/transcript-type.controller";
+import * as userDestinationRequestController from "./controllers/user-destination-request.controller";
 
 // API keys and Passport configuration
 import * as passportConfig from "./config/passport";
@@ -37,7 +40,7 @@ import { init as initTranscriptTypeModel } from "./models/transcript-type.model"
 // Create Express server
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "*", credentials: true }));
 
 // Initialize models
 initUserModel();
@@ -148,9 +151,52 @@ app.delete("/delete-college/:id", collegeController.deleteCollege);
 app.get("/departments", departmentController.getDepartments);
 app.get("/department/:id", departmentController.getDepartment);
 app.post("/create-department", departmentController.createDepartment);
-
 app.patch("/edit-department/:id", departmentController.editDepartment);
 app.delete("/delete-department/:id", departmentController.deleteDepartment);
+
+app.get("/destinations", destinationController.getDestinations);
+app.get("/destination/:id", destinationController.getDestination);
+app.post("/create-destination", destinationController.createDestination);
+app.patch("/edit-destination/:id", destinationController.editDestination);
+app.delete("/delete-destination/:id", destinationController.deleteDestination);
+
+app.get("/transcript-types", transcriptTypeController.getTranscriptTypes);
+app.get("/transcript-type/:id", transcriptTypeController.getTranscriptType);
+app.post(
+	"/create-transcript-type",
+	transcriptTypeController.createTranscriptType
+);
+app.patch(
+	"/edit-transcript-type/:id",
+	transcriptTypeController.editTranscriptType
+);
+app.delete(
+	"/delete-transcript-type/:id",
+	transcriptTypeController.deleteTranscriptType
+);
+
+app.get(
+	"/transcript-requests",
+	transcriptRequestController.getTranscriptRequests
+);
+app.get(
+	"/transcript-request/:id",
+	transcriptRequestController.getTranscriptRequest
+);
+app.post(
+	"/submit-request",
+	transcriptRequestController.submitTranscriptRequest
+);
+
+app.post(
+	"/submit-destination-request",
+	userDestinationRequestController.submitDestinationRequest
+);
+
+app.patch(
+	"/accept-destination-request/:id",
+	userDestinationRequestController.acceptDestinationRequest
+);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 	if (!res.headersSent) {

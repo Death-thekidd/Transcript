@@ -35,7 +35,7 @@ const initUserModel = (sequelize) => {
             autoIncrement: false,
             primaryKey: true,
         },
-        username: { type: sequelize_1.DataTypes.STRING, allowNull: false },
+        schoolId: { type: sequelize_1.DataTypes.STRING, allowNull: false },
         password: { type: sequelize_1.DataTypes.STRING, allowNull: false },
         email: { type: sequelize_1.DataTypes.STRING, allowNull: false, unique: true },
         name: { type: sequelize_1.DataTypes.STRING, allowNull: false },
