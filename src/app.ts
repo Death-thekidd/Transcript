@@ -40,7 +40,7 @@ import { init as initTranscriptTypeModel } from "./models/transcript-type.model"
 // Create Express server
 const app = express();
 
-app.use(cors({ origin: "*", credentials: true }));
+app.use(cors());
 
 // Initialize models
 initUserModel();
