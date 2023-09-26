@@ -19,8 +19,30 @@ export const getTranscriptRequests = async (
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const transcriptRequests = await TranscriptRequest.findAll();
-		return res.status(200).json({ data: transcriptRequests });
+		const transcriptRequests = await TranscriptRequest.findAll({
+			include: [Destination, TranscriptType],
+		});
+		const transcriptRequestsData = await Promise.all(
+			transcriptRequests.map(async (transcriptRequest) => {
+				const destinations = await transcriptRequest.getDestinations();
+				const transcriptType = await transcriptRequest.getTranscriptType();
+
+				const destinationtotal = destinations?.reduce(
+					(acc, destination) => (acc += destination?.rate),
+					0
+				);
+				const amount = destinationtotal + transcriptType?.amount;
+
+				return {
+					...transcriptRequest.dataValues,
+					destinations,
+					transcriptTypeDefined: transcriptType,
+					totalFee: amount,
+				};
+			})
+		);
+
+		return res.status(200).json({ data: transcriptRequestsData });
 	} catch (error) {
 		next(error);
 	}
@@ -45,7 +67,23 @@ export const getTranscriptRequest = async (
 			return res.status(404).json({ message: "Transcript Request not found" });
 		}
 
-		return res.status(200).json({ data: transcriptRequest });
+		const destinations = await transcriptRequest?.getDestinations();
+		const transcriptType = await transcriptRequest?.getTranscriptType();
+
+		const destinationtotal = destinations?.reduce(
+			(acc, destination) => (acc += destination?.rate),
+			0
+		);
+		const amount = destinationtotal + transcriptType?.amount;
+
+		return res.status(200).json({
+			data: {
+				...transcriptRequest.dataValues,
+				destinations,
+				transcriptTypeDefined: transcriptType,
+				totalFee: amount,
+			},
+		});
 	} catch (error) {
 		next(error);
 	}
@@ -73,6 +111,7 @@ export const submitTranscriptRequest = async (
 				async function checkUser(
 					done: (err: Error, user: UserInstance) => void
 				) {
+					console.log(req.body.userId);
 					const user = await User.findByPk(req.body.userId);
 					if (!user) {
 						return done(new Error("User not found."), null); // Pass an error to the next function
@@ -101,6 +140,7 @@ export const submitTranscriptRequest = async (
 							transcriptType: transcriptType,
 							status: "pending",
 							userId: userId,
+							total: _transcriptType.amount,
 						});
 						const transcriptRequest = await TranscriptRequest.findByPk(
 							request.id,
@@ -108,13 +148,13 @@ export const submitTranscriptRequest = async (
 								include: Destination,
 							}
 						);
-						for (const { name, deliveryMethod } of destinations) {
+						for (const name of destinations) {
 							const destination = await Destination.findOne({
-								where: { name: name, deliveryMethod: deliveryMethod },
+								where: { id: name },
 							});
 							await transcriptRequest.addDestination(destination);
 						}
-						transcriptRequest.addTranscriptType(_transcriptType);
+						transcriptRequest.setTranscriptType(_transcriptType);
 						done(null, request, user);
 					} catch (error) {
 						console.error("Unable to create Leave request : ", error);

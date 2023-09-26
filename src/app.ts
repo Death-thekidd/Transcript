@@ -127,6 +127,7 @@ app.post(
 );
 
 app.post("/initialize-payment", payStackController.initializePayment);
+app.post("/verify-payment", payStackController.verifyPayment);
 
 app.post("/verify-transaction", walletController.verifyPayment);
 app.post("/wallets", walletController.getWallets);

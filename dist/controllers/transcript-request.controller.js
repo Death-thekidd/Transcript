@@ -25,8 +25,17 @@ const transcript_type_model_1 = require("../models/transcript-type.model");
  */
 const getTranscriptRequests = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const transcriptRequests = yield transcript_request_model_1.TranscriptRequest.findAll();
-        return res.status(200).json({ data: transcriptRequests });
+        const transcriptRequests = yield transcript_request_model_1.TranscriptRequest.findAll({
+            include: [destination_model_1.Destination, transcript_type_model_1.TranscriptType],
+        });
+        const transcriptRequestsData = yield Promise.all(transcriptRequests.map((transcriptRequest) => __awaiter(void 0, void 0, void 0, function* () {
+            const destinations = yield transcriptRequest.getDestinations();
+            const transcriptType = yield transcriptRequest.getTranscriptType();
+            const destinationtotal = destinations === null || destinations === void 0 ? void 0 : destinations.reduce((acc, destination) => (acc += destination === null || destination === void 0 ? void 0 : destination.rate), 0);
+            const amount = destinationtotal + (transcriptType === null || transcriptType === void 0 ? void 0 : transcriptType.amount);
+            return Object.assign(Object.assign({}, transcriptRequest.dataValues), { destinations, transcriptTypeDefined: transcriptType, totalFee: amount });
+        })));
+        return res.status(200).json({ data: transcriptRequestsData });
     }
     catch (error) {
         next(error);
@@ -44,7 +53,13 @@ const getTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, void 
         if (!transcriptRequest) {
             return res.status(404).json({ message: "Transcript Request not found" });
         }
-        return res.status(200).json({ data: transcriptRequest });
+        const destinations = yield (transcriptRequest === null || transcriptRequest === void 0 ? void 0 : transcriptRequest.getDestinations());
+        const transcriptType = yield (transcriptRequest === null || transcriptRequest === void 0 ? void 0 : transcriptRequest.getTranscriptType());
+        const destinationtotal = destinations === null || destinations === void 0 ? void 0 : destinations.reduce((acc, destination) => (acc += destination === null || destination === void 0 ? void 0 : destination.rate), 0);
+        const amount = destinationtotal + (transcriptType === null || transcriptType === void 0 ? void 0 : transcriptType.amount);
+        return res.status(200).json({
+            data: Object.assign(Object.assign({}, transcriptRequest.dataValues), { destinations, transcriptTypeDefined: transcriptType, totalFee: amount }),
+        });
     }
     catch (error) {
         next(error);
@@ -65,6 +80,7 @@ const submitTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, vo
         async_1.default.waterfall([
             function checkUser(done) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    console.log(req.body.userId);
                     const user = yield user_model_1.User.findByPk(req.body.userId);
                     if (!user) {
                         return done(new Error("User not found."), null); // Pass an error to the next function
@@ -88,17 +104,18 @@ const submitTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, vo
                             transcriptType: transcriptType,
                             status: "pending",
                             userId: userId,
+                            total: _transcriptType.amount,
                         });
                         const transcriptRequest = yield transcript_request_model_1.TranscriptRequest.findByPk(request.id, {
                             include: destination_model_1.Destination,
                         });
-                        for (const { name, deliveryMethod } of destinations) {
+                        for (const name of destinations) {
                             const destination = yield destination_model_1.Destination.findOne({
-                                where: { name: name, deliveryMethod: deliveryMethod },
+                                where: { id: name },
                             });
                             yield transcriptRequest.addDestination(destination);
                         }
-                        transcriptRequest.addTranscriptType(_transcriptType);
+                        transcriptRequest.setTranscriptType(_transcriptType);
                         done(null, request, user);
                     }
                     catch (error) {

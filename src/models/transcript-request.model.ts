@@ -7,15 +7,11 @@ import {
 	TranscriptTypeInstance,
 } from "./transcript-type.model";
 
-export enum TranscriptTypeEnum {
-	LOCAL = "local",
-	STAFF = "staff",
-}
 export interface TranscriptRequestDocument {
 	id: string;
 	college: string;
 	department: string;
-	transcriptType: TranscriptTypeEnum;
+	transcriptType: string;
 	status: string;
 	matricNo: string;
 	userId: string;
@@ -27,7 +23,9 @@ export interface TranscriptRequestInstance
 	extends Model<TranscriptRequestDocument>,
 		TranscriptRequestDocument {
 	addDestination: (destination: DestinationInstance) => Promise<void>;
-	addTranscriptType: (transcriptType: TranscriptTypeInstance) => Promise<void>;
+	getDestinations: () => Promise<DestinationInstance[]>;
+	getTranscriptType: () => Promise<TranscriptTypeInstance>;
+	setTranscriptType: (transcriptType: TranscriptTypeInstance) => Promise<void>;
 }
 
 export const initTranscriptRequestModel = (sequelize: Sequelize) => {
@@ -54,7 +52,7 @@ export const initTranscriptRequestModel = (sequelize: Sequelize) => {
 				allowNull: false,
 			},
 			transcriptType: {
-				type: DataTypes.ENUM("local", "international"),
+				type: DataTypes.STRING(100),
 				allowNull: false,
 			},
 			status: {

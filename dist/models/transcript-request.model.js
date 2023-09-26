@@ -12,16 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init = exports.TranscriptRequest = exports.initTranscriptRequestModel = exports.TranscriptTypeEnum = void 0;
+exports.init = exports.TranscriptRequest = exports.initTranscriptRequestModel = void 0;
 const sequelize_1 = require("sequelize");
 const sequelize_2 = __importDefault(require("../sequelize"));
 const destination_model_1 = require("./destination.model");
 const transcript_type_model_1 = require("./transcript-type.model");
-var TranscriptTypeEnum;
-(function (TranscriptTypeEnum) {
-    TranscriptTypeEnum["LOCAL"] = "local";
-    TranscriptTypeEnum["STAFF"] = "staff";
-})(TranscriptTypeEnum = exports.TranscriptTypeEnum || (exports.TranscriptTypeEnum = {}));
 const initTranscriptRequestModel = (sequelize) => {
     const TranscriptRequest = sequelize.define("TranscriptRequest", {
         id: {
@@ -44,7 +39,7 @@ const initTranscriptRequestModel = (sequelize) => {
             allowNull: false,
         },
         transcriptType: {
-            type: sequelize_1.DataTypes.ENUM("local", "international"),
+            type: sequelize_1.DataTypes.STRING(100),
             allowNull: false,
         },
         status: {

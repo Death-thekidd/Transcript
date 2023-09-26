@@ -122,6 +122,7 @@ app.post("/account/profile", passportConfig.isAuthenticated, userController.post
 app.post("/account/password", passportConfig.isAuthenticated, userController.postUpdatePassword);
 app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.post("/initialize-payment", payStackController.initializePayment);
+app.post("/verify-payment", payStackController.verifyPayment);
 app.post("/verify-transaction", walletController.verifyPayment);
 app.post("/wallets", walletController.getWallets);
 app.post("/wallet/:id", walletController.getWallet);
