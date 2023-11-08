@@ -44,14 +44,17 @@ function seedRolesAndPrivileges() {
             ];
             for (const roleData of rolesWithPrivileges) {
                 // Create the role
-                const role = yield role_model_1.Role.create({ name: roleData.name });
+                const role = yield role_model_1.Role.findOrCreate({
+                    where: { name: roleData.name },
+                    defaults: { name: roleData.name },
+                });
                 // Assign privileges by name
                 for (const privilegeName of roleData.privileges) {
                     const privilege = yield privilege_model_1.Privilege.findOne({
                         where: { name: privilegeName },
                     });
                     if (privilege) {
-                        yield role.addPrivilege(privilege);
+                        yield role[0].addPrivilege(privilege);
                     }
                 }
             }

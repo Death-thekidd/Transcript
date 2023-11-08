@@ -33,7 +33,25 @@ const bcrypt_nodejs_1 = __importDefault(require("bcrypt-nodejs"));
 const getUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield user_model_1.User.findAll();
-        return res.status(200).json({ data: users });
+        // Map users to include roles and privileges
+        const usersWithRolesAndPrivileges = yield Promise.all(users.map((user) => __awaiter(void 0, void 0, void 0, function* () {
+            // Get the user's roles
+            const roles = yield user.getRoles();
+            // Initialize an array to store privileges
+            const privileges = [];
+            // Loop through each role and fetch its associated privileges
+            for (const role of roles) {
+                const rolePrivileges = yield role.getPrivileges();
+                // Check and add privileges if they don't already exist in the privileges array
+                for (const privilege of rolePrivileges) {
+                    if (!privileges.some((p) => p.name === privilege.name)) {
+                        privileges.push(privilege);
+                    }
+                }
+            }
+            return Object.assign(Object.assign({}, user.dataValues), { privileges, roles: roles.map((role) => role === null || role === void 0 ? void 0 : role.name) });
+        })));
+        return res.status(200).json({ data: usersWithRolesAndPrivileges });
     }
     catch (error) {
         next(error);
@@ -65,9 +83,7 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
                 }
             }
         }
-        return res
-            .status(200)
-            .json({
+        return res.status(200).json({
             data: Object.assign(Object.assign({}, user.dataValues), { privileges, roles: roles.map((role) => role === null || role === void 0 ? void 0 : role.name) }),
         });
     }
