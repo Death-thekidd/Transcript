@@ -26,8 +26,5 @@ export async function seedUsers(): Promise<void> {
 		console.log("User seeding completed.");
 	} catch (error) {
 		console.error("Error seeding users:", error);
-	} finally {
-		// Close the database connection
-		await sequelize.close();
 	}
 }

@@ -41,10 +41,6 @@ function seedUsers() {
         catch (error) {
             console.error("Error seeding users:", error);
         }
-        finally {
-            // Close the database connection
-            yield sequelize_1.default.close();
-        }
     });
 }
 exports.seedUsers = seedUsers;

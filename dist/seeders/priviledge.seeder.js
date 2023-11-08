@@ -82,10 +82,6 @@ function seedPrivileges() {
         catch (error) {
             console.error("Error seeding privileges:", error);
         }
-        finally {
-            // Close the database connection
-            yield sequelize_1.default.close();
-        }
     });
 }
 exports.seedPrivileges = seedPrivileges;

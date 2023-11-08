@@ -68,8 +68,5 @@ export async function seedPrivileges(): Promise<void> {
 		console.log("Privileges seeding completed.");
 	} catch (error) {
 		console.error("Error seeding privileges:", error);
-	} finally {
-		// Close the database connection
-		await sequelize.close();
 	}
 }

@@ -47,8 +47,5 @@ export async function seedRolesAndPrivileges(): Promise<void> {
 		console.log("Roles and privileges seeding completed.");
 	} catch (error) {
 		console.error("Error seeding roles and privileges:", error);
-	} finally {
-		// Close the database connection
-		await sequelize.close();
 	}
 }
