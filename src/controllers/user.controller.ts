@@ -1637,7 +1637,7 @@ async function updateUser(userId: string, userData: any) {
 
 /**
  * Update profile information.
- * @route POST /update-user/:id
+ * @route PATCH /update-user/:id
  */
 export const UpdateUser = async (
 	req: Request,
@@ -1673,15 +1673,15 @@ export const UpdateUser = async (
 
 /**
  * Delete user account.
- * @route POST /account/delete
+ * @route DELETE /delete-user/:ID
  */
-export const postDeleteAccount = async (
+export const postDeleteUser = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const userId = (req.body as UserInstance).id; // Assuming you have a user object in the request with an 'id' property
+		const userId = req.params.id; // Assuming you have a user object in the request with an 'id' property
 
 		const user = await User.findByPk(userId);
 

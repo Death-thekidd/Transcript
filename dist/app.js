@@ -52,8 +52,6 @@ const destinationController = __importStar(require("./controllers/destination.co
 const transcriptRequestController = __importStar(require("./controllers/transcript-request.controller"));
 const transcriptTypeController = __importStar(require("./controllers/transcript-type.controller"));
 const userDestinationRequestController = __importStar(require("./controllers/user-destination-request.controller"));
-// API keys and Passport configuration
-const passportConfig = __importStar(require("./config/passport"));
 const sequelize_1 = __importDefault(require("./sequelize"));
 const user_model_1 = require("./models/user.model");
 const wallet_model_1 = require("./models/wallet.model");
@@ -154,11 +152,11 @@ app.post("/signup", userController.postSignup);
 app.post("/create-role", roleController.createRole);
 app.get("/roles", roleController.getRoles);
 app.get("/role/:id", roleController.getRole);
-app.get("/edit-role", roleController.editRole);
-app.get("/delete-role", roleController.deleteRole);
+app.patch("/edit-role/:id", roleController.editRole);
+app.delete("/delete-role/:id", roleController.deleteRole);
 app.get("/priviledges", privilegeController.getPrivileges);
-app.post("/update-user/:id", passportConfig.isAuthenticated, userController.UpdateUser);
-app.post("/account/delete", passportConfig.isAuthenticated, userController.postDeleteAccount);
+app.patch("/update-user/:id", userController.UpdateUser);
+app.delete("/delete-user/:id", userController.postDeleteUser);
 app.post("/initialize-payment", payStackController.initializePayment);
 app.post("/verify-payment", payStackController.verifyPayment);
 app.post("/verify-transaction", walletController.verifyPayment);

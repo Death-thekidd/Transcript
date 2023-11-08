@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postForgot = exports.postReset = exports.postDeleteAccount = exports.UpdateUser = exports.postSignup = exports.createUser = exports.logout = exports.postLogin = exports.getUser = exports.getUsers = void 0;
+exports.postForgot = exports.postReset = exports.postDeleteUser = exports.UpdateUser = exports.postSignup = exports.createUser = exports.logout = exports.postLogin = exports.getUser = exports.getUsers = void 0;
 const async_1 = __importDefault(require("async"));
 const crypto_1 = __importDefault(require("crypto"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
@@ -1584,7 +1584,7 @@ function updateUser(userId, userData) {
 }
 /**
  * Update profile information.
- * @route POST /update-user/:id
+ * @route PATCH /update-user/:id
  */
 const UpdateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     yield express_validator_1.check("email", "Please enter a valid email address.").isEmail().run(req);
@@ -1613,11 +1613,11 @@ const UpdateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.UpdateUser = UpdateUser;
 /**
  * Delete user account.
- * @route POST /account/delete
+ * @route DELETE /delete-user/:ID
  */
-const postDeleteAccount = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const postDeleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = req.body.id; // Assuming you have a user object in the request with an 'id' property
+        const userId = req.params.id; // Assuming you have a user object in the request with an 'id' property
         const user = yield user_model_1.User.findByPk(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found." });
@@ -1631,7 +1631,7 @@ const postDeleteAccount = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         next(error);
     }
 });
-exports.postDeleteAccount = postDeleteAccount;
+exports.postDeleteUser = postDeleteUser;
 /**
  * Process the reset password request.
  * @route POST /reset/:token

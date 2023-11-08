@@ -138,21 +138,13 @@ app.post("/signup", userController.postSignup);
 app.post("/create-role", roleController.createRole);
 app.get("/roles", roleController.getRoles);
 app.get("/role/:id", roleController.getRole);
-app.get("/edit-role", roleController.editRole);
-app.get("/delete-role", roleController.deleteRole);
+app.patch("/edit-role/:id", roleController.editRole);
+app.delete("/delete-role/:id", roleController.deleteRole);
 
 app.get("/priviledges", privilegeController.getPrivileges);
 
-app.post(
-	"/update-user/:id",
-	passportConfig.isAuthenticated,
-	userController.UpdateUser
-);
-app.post(
-	"/account/delete",
-	passportConfig.isAuthenticated,
-	userController.postDeleteAccount
-);
+app.patch("/update-user/:id", userController.UpdateUser);
+app.delete("/delete-user/:id", userController.postDeleteUser);
 
 app.post("/initialize-payment", payStackController.initializePayment);
 app.post("/verify-payment", payStackController.verifyPayment);
