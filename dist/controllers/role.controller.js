@@ -20,8 +20,19 @@ const privilege_model_1 = require("../models/privilege.model");
  */
 const getRoles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const roles = yield role_model_1.Role.findAll();
-        return res.status(200).json({ data: roles });
+        const roles = yield role_model_1.Role.findAll({
+            include: privilege_model_1.Privilege, // Include the Privilege model to fetch associated privileges
+        });
+        // Map the roles and format the response
+        const rolesWithPrivileges = roles.map((role) => {
+            return {
+                id: role.id,
+                name: role.name,
+                privileges: role.Privileges.map((privilege) => privilege.name),
+                // Add other role properties if needed
+            };
+        });
+        return res.status(200).json({ data: rolesWithPrivileges });
     }
     catch (error) {
         next(error);
@@ -32,14 +43,27 @@ exports.getRoles = getRoles;
  * Get role by ID
  * @route GET /role/:id
  */
+/**
+ * Get role by ID
+ * @route GET /role/:id
+ */
 const getRole = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const roleId = req.params.id;
-        const role = yield role_model_1.Role.findByPk(roleId);
+        const role = yield role_model_1.Role.findByPk(roleId, {
+            include: privilege_model_1.Privilege, // Include the Privilege model to fetch associated privileges
+        });
         if (!role) {
             return res.status(404).json({ message: "Role not found" });
         }
-        return res.status(200).json({ data: role });
+        // Format the response to include privileges
+        const roleWithPrivileges = {
+            id: role.id,
+            name: role.name,
+            privileges: role.Privileges.map((privilege) => privilege.name),
+            // Add other role properties if needed
+        };
+        return res.status(200).json({ data: roleWithPrivileges });
     }
     catch (error) {
         next(error);
