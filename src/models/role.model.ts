@@ -1,13 +1,18 @@
 import { DataTypes, Model, Sequelize } from "sequelize";
 import sequelize from "../sequelize";
 import { User } from "./user.model";
+import { Privilege, PrivilegeInstance } from "./privilege.model";
 
 export interface RoleDocument {
 	id: string;
 	name: string;
 }
 
-export interface RoleInstance extends Model<RoleDocument>, RoleDocument {}
+export interface RoleInstance extends Model<RoleDocument>, RoleDocument {
+	getPrivileges(): Promise<PrivilegeInstance[]>;
+	addPrivilege(privilege: PrivilegeInstance): Promise<any>;
+	removePrivileges(): Promise<any>;
+}
 
 export const initRoleModel = (sequelize: Sequelize) => {
 	const Role = sequelize.define<RoleInstance>("Role", {
@@ -25,6 +30,16 @@ export const initRoleModel = (sequelize: Sequelize) => {
 };
 
 export const Role = initRoleModel(sequelize);
+
+Role.belongsToMany(Privilege, {
+	through: "role_privileges",
+	foreignKey: "roleId",
+});
+
+Privilege.belongsToMany(Role, {
+	through: "role_privileges",
+	foreignKey: "privilegeId",
+});
 
 export async function init() {
 	try {

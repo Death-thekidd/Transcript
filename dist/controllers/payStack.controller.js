@@ -89,7 +89,7 @@ const verifyPayment = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         // Do something with event
         if (event && event.event === "charge.success") {
             const { metadata: { transcriptRequestId }, } = event.data;
-            const transcriptRequest = yield transcript_request_model_1.TranscriptRequest.update({ isPaid: true }, { where: { id: transcriptRequestId } });
+            const transcriptRequest = yield transcript_request_model_1.TranscriptRequest.update({ status: "paid" }, { where: { id: transcriptRequestId } });
             return res
                 .status(200)
                 .json({ message: "payment successfull", data: transcriptRequest });

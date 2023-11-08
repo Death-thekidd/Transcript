@@ -35,6 +35,7 @@ export interface UserInstance extends Model<UserDocument>, UserDocument {
 	): Promise<boolean>;
 	getRoles(): Promise<RoleInstance[]>;
 	addRole(role: RoleInstance): Promise<any>;
+	removeRole(role: RoleInstance): Promise<any>;
 }
 
 export interface AuthToken {

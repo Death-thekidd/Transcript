@@ -12,12 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init = exports.Role = exports.initRoleModel = void 0;
+exports.init = exports.Privilege = exports.initPrivilegeModel = void 0;
 const sequelize_1 = require("sequelize");
 const sequelize_2 = __importDefault(require("../sequelize"));
-const privilege_model_1 = require("./privilege.model");
-const initRoleModel = (sequelize) => {
-    const Role = sequelize.define("Role", {
+const initPrivilegeModel = (sequelize) => {
+    const Privilege = sequelize.define("Privilege", {
         id: {
             type: sequelize_1.DataTypes.UUID,
             defaultValue: sequelize_1.DataTypes.UUIDV4,
@@ -26,23 +25,16 @@ const initRoleModel = (sequelize) => {
             primaryKey: true,
         },
         name: { type: sequelize_1.DataTypes.STRING(50), allowNull: false, unique: true },
+        path: { type: sequelize_1.DataTypes.STRING(50), allowNull: false, unique: true },
     });
-    return Role;
+    return Privilege;
 };
-exports.initRoleModel = initRoleModel;
-exports.Role = exports.initRoleModel(sequelize_2.default);
-exports.Role.belongsToMany(privilege_model_1.Privilege, {
-    through: "role_privileges",
-    foreignKey: "roleId",
-});
-privilege_model_1.Privilege.belongsToMany(exports.Role, {
-    through: "role_privileges",
-    foreignKey: "privilegeId",
-});
+exports.initPrivilegeModel = initPrivilegeModel;
+exports.Privilege = exports.initPrivilegeModel(sequelize_2.default);
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield exports.Role.sequelize.sync();
+            yield exports.Privilege.sequelize.sync();
             // console.log("Database and tables synced successfully");
         }
         catch (error) {
@@ -51,4 +43,4 @@ function init() {
     });
 }
 exports.init = init;
-//# sourceMappingURL=role.model.js.map
+//# sourceMappingURL=privilege.model.js.map

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateTranscriptRequestPdf = exports.submitTranscriptRequest = exports.getTranscriptRequest = exports.getTranscriptRequests = void 0;
+exports.generateTranscriptRequestPdf = exports.deleteTranscriptRequest = exports.updateTranscriptRequestStaus = exports.submitTranscriptRequest = exports.getTranscriptRequest = exports.getTranscriptRequests = void 0;
 const transcript_request_model_1 = require("../models/transcript-request.model");
 const user_model_1 = require("../models/user.model");
 const express_validator_1 = require("express-validator");
@@ -31,9 +31,10 @@ const getTranscriptRequests = (req, res, next) => __awaiter(void 0, void 0, void
         const transcriptRequestsData = yield Promise.all(transcriptRequests.map((transcriptRequest) => __awaiter(void 0, void 0, void 0, function* () {
             const destinations = yield transcriptRequest.getDestinations();
             const transcriptType = yield transcriptRequest.getTranscriptType();
+            const user = yield user_model_1.User.findByPk(transcriptRequest === null || transcriptRequest === void 0 ? void 0 : transcriptRequest.userId);
             const destinationtotal = destinations === null || destinations === void 0 ? void 0 : destinations.reduce((acc, destination) => (acc += destination === null || destination === void 0 ? void 0 : destination.rate), 0);
             const amount = destinationtotal + (transcriptType === null || transcriptType === void 0 ? void 0 : transcriptType.amount);
-            return Object.assign(Object.assign({}, transcriptRequest.dataValues), { destinations, transcriptTypeDefined: transcriptType, totalFee: amount });
+            return Object.assign(Object.assign({}, transcriptRequest.dataValues), { destinations, transcriptTypeDefined: transcriptType, totalFee: amount, name: user === null || user === void 0 ? void 0 : user.name });
         })));
         return res.status(200).json({ data: transcriptRequestsData });
     }
@@ -139,6 +140,46 @@ const submitTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, vo
     }
 });
 exports.submitTranscriptRequest = submitTranscriptRequest;
+/**
+ * Update Transcript request status
+ * @route PATCH /update-transcript-request-status/:id
+ */
+const updateTranscriptRequestStaus = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.params.id;
+        const { status } = req.body;
+        yield transcript_request_model_1.TranscriptRequest.update({ status: status }, { where: { id: id } });
+        return res.status(204).json({ message: "Transcript Request status updated successfullu" });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.updateTranscriptRequestStaus = updateTranscriptRequestStaus;
+/**
+ * Delete Transcript request
+ * @route DELETE /delete-transcript-request/:id
+ */
+const deleteTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const transcriptRequestId = req.params.id;
+        const transcriptRequest = yield transcript_request_model_1.TranscriptRequest.findOne({
+            where: { id: transcriptRequestId },
+        });
+        if (transcriptRequest) {
+            // Delete the record
+            yield transcriptRequest.destroy();
+            return res.status(204).json({ message: "transcript request deleted successfully." });
+        }
+        else {
+            return res.status(404).json({ message: "transcript request not found." });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.deleteTranscriptRequest = deleteTranscriptRequest;
 /**
  * Generate Transcript request PDF
  * @route GET /generate-transcript-request-pdf/:id

@@ -94,7 +94,7 @@ export const verifyPayment = async (
 			} = event.data;
 
 			const transcriptRequest = await TranscriptRequest.update(
-				{ isPaid: true },
+				{status: "paid"},
 				{ where: { id: transcriptRequestId } }
 			);
 			return res

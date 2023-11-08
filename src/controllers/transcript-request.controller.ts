@@ -27,6 +27,8 @@ export const getTranscriptRequests = async (
 				const destinations = await transcriptRequest.getDestinations();
 				const transcriptType = await transcriptRequest.getTranscriptType();
 
+				const user = await User.findByPk(transcriptRequest?.userId);
+
 				const destinationtotal = destinations?.reduce(
 					(acc, destination) => (acc += destination?.rate),
 					0
@@ -38,6 +40,7 @@ export const getTranscriptRequests = async (
 					destinations,
 					transcriptTypeDefined: transcriptType,
 					totalFee: amount,
+					name: user?.name
 				};
 			})
 		);
@@ -177,6 +180,58 @@ export const submitTranscriptRequest = async (
 		return res.status(500).json({ error: error });
 	}
 };
+
+/**
+ * Update Transcript request status
+ * @route PATCH /update-transcript-request-status/:id
+ */
+export const updateTranscriptRequestStaus = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response<any, Record<string, any>>> => {
+	try {
+		const id = req.params.id;
+		const {status} = req.body;
+		await TranscriptRequest.update(
+			{status: status},
+			{ where: { id: id } }
+		);
+
+		return res.status(204).json({ message: "Transcript Request status updated successfullu" });
+	} catch (error) {
+		next(error);
+	}
+};
+
+/**
+ * Delete Transcript request
+ * @route DELETE /delete-transcript-request/:id
+ */
+export const deleteTranscriptRequest = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response<any, Record<string, any>>> => {
+	try {
+		const transcriptRequestId = req.params.id;
+		const transcriptRequest= await TranscriptRequest.findOne({
+			where: { id: transcriptRequestId },
+		});
+
+		if (transcriptRequest) {
+			// Delete the record
+			await transcriptRequest.destroy();
+			return res.status(204).json({ message: "transcript request deleted successfully." });
+		} else {
+			return res.status(404).json({ message: "transcript request not found." });
+		}
+	} catch (error) {
+		next(error);
+	}
+};
+
+
 /**
  * Generate Transcript request PDF
  * @route GET /generate-transcript-request-pdf/:id

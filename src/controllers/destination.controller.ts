@@ -67,7 +67,7 @@ export const createDestination = async (
 		});
 		return res
 			.status(200)
-			.json({ message: "College created succesfully", data: destination });
+			.json({ message: "Destination created succesfully", data: destination });
 	} catch (error) {
 		return res.status(500).json({ error: error });
 	}
