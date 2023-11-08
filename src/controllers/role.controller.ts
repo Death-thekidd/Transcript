@@ -15,8 +15,21 @@ export const getRoles = async (
 	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const roles = await Role.findAll();
-		return res.status(200).json({ data: roles });
+		const roles = await Role.findAll({
+			include: Privilege, // Include the Privilege model to fetch associated privileges
+		});
+
+		// Map the roles and format the response
+		const rolesWithPrivileges = roles.map((role) => {
+			return {
+				id: role.id,
+				name: role.name,
+				privileges: role.Privileges.map((privilege) => privilege.name),
+				// Add other role properties if needed
+			};
+		});
+
+		return res.status(200).json({ data: rolesWithPrivileges });
 	} catch (error) {
 		next(error);
 	}
@@ -26,24 +39,39 @@ export const getRoles = async (
  * Get role by ID
  * @route GET /role/:id
  */
+/**
+ * Get role by ID
+ * @route GET /role/:id
+ */
 export const getRole = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+  ): Promise<Response<any, Record<string, any>>> => {
 	try {
-		const roleId = req.params.id;
-		const role = await Role.findByPk(roleId);
-
-		if (!role) {
-			return res.status(404).json({ message: "Role not found" });
-		}
-
-		return res.status(200).json({ data: role });
+	  const roleId = req.params.id;
+	  const role = await Role.findByPk(roleId, {
+		include: Privilege, // Include the Privilege model to fetch associated privileges
+	  });
+  
+	  if (!role) {
+		return res.status(404).json({ message: "Role not found" });
+	  }
+  
+	  // Format the response to include privileges
+	  const roleWithPrivileges = {
+		id: role.id,
+		name: role.name,
+		privileges: role.Privileges.map((privilege) => privilege.name),
+		// Add other role properties if needed
+	  };
+  
+	  return res.status(200).json({ data: roleWithPrivileges });
 	} catch (error) {
-		next(error);
+	  next(error);
 	}
-};
+  };
+  
 
 async function assignPrivilegesToRole(
 	role: RoleInstance,

@@ -12,6 +12,7 @@ export interface RoleInstance extends Model<RoleDocument>, RoleDocument {
 	getPrivileges(): Promise<PrivilegeInstance[]>;
 	addPrivilege(privilege: PrivilegeInstance): Promise<any>;
 	removePrivileges(): Promise<any>;
+	Privileges: PrivilegeInstance[];
 }
 
 export const initRoleModel = (sequelize: Sequelize) => {
