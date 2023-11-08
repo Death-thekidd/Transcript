@@ -73,7 +73,15 @@ export const getUser = async (
 			}
 		}
 
-		return res.status(200).json({ data: { ...user.dataValues, privileges } });
+		return res
+			.status(200)
+			.json({
+				data: {
+					...user.dataValues,
+					privileges,
+					roles: roles.map((role) => role?.name),
+				},
+			});
 	} catch (error) {
 		next(error);
 	}

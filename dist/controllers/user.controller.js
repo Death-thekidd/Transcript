@@ -65,7 +65,11 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
                 }
             }
         }
-        return res.status(200).json({ data: Object.assign(Object.assign({}, user.dataValues), { privileges }) });
+        return res
+            .status(200)
+            .json({
+            data: Object.assign(Object.assign({}, user.dataValues), { privileges, roles: roles.map((role) => role === null || role === void 0 ? void 0 : role.name) }),
+        });
     }
     catch (error) {
         next(error);
