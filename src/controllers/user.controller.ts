@@ -28,7 +28,7 @@ import bcrypt from "bcrypt-nodejs";
 export const getUsers = async (
 	req: Request,
 	res: Response,
-	next: NextFunction
+	next: NextFunctionx
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
 		const users = await User.findAll();
@@ -73,15 +73,13 @@ export const getUser = async (
 			}
 		}
 
-		return res
-			.status(200)
-			.json({
-				data: {
-					...user.dataValues,
-					privileges,
-					roles: roles.map((role) => role?.name),
-				},
-			});
+		return res.status(200).json({
+			data: {
+				...user.dataValues,
+				privileges,
+				roles: roles.map((role) => role?.name),
+			},
+		});
 	} catch (error) {
 		next(error);
 	}
