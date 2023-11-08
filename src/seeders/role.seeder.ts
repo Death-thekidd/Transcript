@@ -31,7 +31,10 @@ export async function seedRolesAndPrivileges(): Promise<void> {
 
 		for (const roleData of rolesWithPrivileges) {
 			// Create the role
-			const role = await Role.create({ name: roleData.name });
+			const role = await Role.findOrCreate({
+				where: { name: roleData.name },
+				defaults: { name: roleData.name },
+			});
 
 			// Assign privileges by name
 			for (const privilegeName of roleData.privileges) {
@@ -39,7 +42,7 @@ export async function seedRolesAndPrivileges(): Promise<void> {
 					where: { name: privilegeName },
 				});
 				if (privilege) {
-					await role.addPrivilege(privilege);
+					await role[0].addPrivilege(privilege);
 				}
 			}
 		}

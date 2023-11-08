@@ -2,21 +2,16 @@ import async from "async";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import passport from "passport";
-import {
-	User,
-	UserDocument,
-	AuthToken,
-	UserInstance,
-} from "../models/user.model";
+import { User, UserDocument, UserInstance } from "../models/user.model";
 import { Request, Response, NextFunction } from "express";
 import { IVerifyOptions } from "passport-local";
 import { WriteError } from "mongodb";
 import { body, check, validationResult } from "express-validator";
 import "../config/passport";
-import { CallbackError, NativeError } from "mongoose";
+import { NativeError } from "mongoose";
 import { Op } from "sequelize";
 import sendMail from "../sendMail";
-import { Role, RoleInstance } from "../models/role.model";
+import { Role } from "../models/role.model";
 import { College } from "../models/college.model";
 import { Department } from "../models/department.model";
 import bcrypt from "bcrypt-nodejs";
@@ -28,11 +23,41 @@ import bcrypt from "bcrypt-nodejs";
 export const getUsers = async (
 	req: Request,
 	res: Response,
-	next: NextFunctionx
+	next: NextFunction
 ): Promise<Response<any, Record<string, any>>> => {
 	try {
 		const users = await User.findAll();
-		return res.status(200).json({ data: users });
+
+		// Map users to include roles and privileges
+		const usersWithRolesAndPrivileges = await Promise.all(
+			users.map(async (user) => {
+				// Get the user's roles
+				const roles = await user.getRoles();
+
+				// Initialize an array to store privileges
+				const privileges: any[] = [];
+
+				// Loop through each role and fetch its associated privileges
+				for (const role of roles) {
+					const rolePrivileges = await role.getPrivileges();
+
+					// Check and add privileges if they don't already exist in the privileges array
+					for (const privilege of rolePrivileges) {
+						if (!privileges.some((p) => p.name === privilege.name)) {
+							privileges.push(privilege);
+						}
+					}
+				}
+
+				return {
+					...user.dataValues,
+					privileges,
+					roles: roles.map((role) => role?.name),
+				};
+			})
+		);
+
+		return res.status(200).json({ data: usersWithRolesAndPrivileges });
 	} catch (error) {
 		next(error);
 	}
