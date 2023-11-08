@@ -51,7 +51,21 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        return res.status(200).json({ data: user });
+        // Get the user's roles
+        const roles = yield user.getRoles();
+        // Initialize an array to store privileges
+        const privileges = [];
+        // Loop through each role and fetch its associated privileges
+        for (const role of roles) {
+            const rolePrivileges = yield role.getPrivileges();
+            // Check and add privileges if they don't already exist in the privileges array
+            for (const privilege of rolePrivileges) {
+                if (!privileges.some((p) => p.name === privilege.name)) {
+                    privileges.push(privilege);
+                }
+            }
+        }
+        return res.status(200).json({ data: Object.assign(Object.assign({}, user.dataValues), { privileges }) });
     }
     catch (error) {
         next(error);

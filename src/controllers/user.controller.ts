@@ -54,7 +54,26 @@ export const getUser = async (
 		if (!user) {
 			return res.status(404).json({ message: "User not found" });
 		}
-		return res.status(200).json({ data: user });
+
+		// Get the user's roles
+		const roles = await user.getRoles();
+
+		// Initialize an array to store privileges
+		const privileges: any[] = [];
+
+		// Loop through each role and fetch its associated privileges
+		for (const role of roles) {
+			const rolePrivileges = await role.getPrivileges();
+
+			// Check and add privileges if they don't already exist in the privileges array
+			for (const privilege of rolePrivileges) {
+				if (!privileges.some((p) => p.name === privilege.name)) {
+					privileges.push(privilege);
+				}
+			}
+		}
+
+		return res.status(200).json({ data: { ...user.dataValues, privileges } });
 	} catch (error) {
 		next(error);
 	}
@@ -1592,25 +1611,27 @@ async function updateUser(userId: string, userData: any) {
 	// Update user roles
 	if (userData.roles) {
 		const newRoles = userData.roles;
-      const currentRoles = await user.getRoles();
+		const currentRoles = await user.getRoles();
 
-      // Remove roles that are not in the new roles array
-      for (const currentRole of currentRoles) {
-        if (!newRoles.includes(currentRole.name)) {
-          await user.removeRole(currentRole);
-        }
-      }
+		// Remove roles that are not in the new roles array
+		for (const currentRole of currentRoles) {
+			if (!newRoles.includes(currentRole.name)) {
+				await user.removeRole(currentRole);
+			}
+		}
 
-      // Add new roles
-      for (const role of newRoles) {
-        const defaultRole = await Role.findOne({ where: { name: role } });
-        if (defaultRole) {
-          const hasRole = currentRoles.some((currentRole) => currentRole.name === role);
-          if (!hasRole) {
-            await user.addRole(defaultRole);
-          }
-        }
-      }
+		// Add new roles
+		for (const role of newRoles) {
+			const defaultRole = await Role.findOne({ where: { name: role } });
+			if (defaultRole) {
+				const hasRole = currentRoles.some(
+					(currentRole) => currentRole.name === role
+				);
+				if (!hasRole) {
+					await user.addRole(defaultRole);
+				}
+			}
+		}
 	}
 }
 
