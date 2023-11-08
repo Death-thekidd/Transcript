@@ -138,7 +138,7 @@ app.get("/role/:id", roleController.getRole);
 app.patch("/edit-role/:id", roleController.editRole);
 app.delete("/delete-role/:id", roleController.deleteRole);
 
-app.get("/priviledges", privilegeController.getPrivileges);
+app.get("/privileges", privilegeController.getPrivileges);
 
 app.patch("/update-user/:id", userController.UpdateUser);
 app.delete("/delete-user/:id", userController.postDeleteUser);
