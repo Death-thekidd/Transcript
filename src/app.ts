@@ -76,9 +76,6 @@ async function runAllSeeders() {
 		console.log("All seeders completed.");
 	} catch (error) {
 		console.error("Error running seeders:", error);
-	} finally {
-		// Close the database connection
-		await sequelize.close();
 	}
 }
 

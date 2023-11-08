@@ -98,10 +98,6 @@ function runAllSeeders() {
         catch (error) {
             console.error("Error running seeders:", error);
         }
-        finally {
-            // Close the database connection
-            yield sequelize_1.default.close();
-        }
     });
 }
 // Call the function to run all seeders
