@@ -143,8 +143,8 @@ const logger = winston_1.default.createLogger({
  */
 app.get("/", (req, res) => {
     var _a, _b;
-    if ((_a = req === null || req === void 0 ? void 0 : req.session) === null || _a === void 0 ? void 0 : _a.id) {
-        return res.json({ valid: true, userId: (_b = req === null || req === void 0 ? void 0 : req.session) === null || _b === void 0 ? void 0 : _b.id });
+    if ((_a = req === null || req === void 0 ? void 0 : req.session) === null || _a === void 0 ? void 0 : _a.userId) {
+        return res.json({ valid: true, userId: (_b = req === null || req === void 0 ? void 0 : req.session) === null || _b === void 0 ? void 0 : _b.userId });
     }
     else {
         return res.json({ valid: false });

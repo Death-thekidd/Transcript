@@ -120,7 +120,7 @@ const postLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function
                 return res.status(500).json({ error: err.message }); // Internal server error
             }
             // Return success message and user data as JSON
-            req.session.id = user === null || user === void 0 ? void 0 : user.id;
+            req.session.userId = user === null || user === void 0 ? void 0 : user.id;
             return res
                 .status(200)
                 .json({ message: "Success! You are logged in.", user });

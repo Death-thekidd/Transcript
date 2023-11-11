@@ -127,8 +127,8 @@ const logger = winston.createLogger({
  * Primary app routes.
  */
 app.get("/", (req: Request, res: Response) => {
-	if (req?.session?.id) {
-		return res.json({ valid: true, userId: req?.session?.id });
+	if (req?.session?.userId) {
+		return res.json({ valid: true, userId: req?.session?.userId });
 	} else {
 		return res.json({ valid: false });
 	}

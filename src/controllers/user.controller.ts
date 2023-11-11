@@ -147,7 +147,7 @@ export const postLogin = async (
 					return res.status(500).json({ error: err.message }); // Internal server error
 				}
 				// Return success message and user data as JSON
-				req.session.id = user?.id;
+				req.session.userId = user?.id;
 				return res
 					.status(200)
 					.json({ message: "Success! You are logged in.", user });
