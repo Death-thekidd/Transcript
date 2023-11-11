@@ -37,6 +37,7 @@ const express_session_1 = __importDefault(require("express-session"));
 const passport_1 = __importDefault(require("passport"));
 const winston_1 = __importDefault(require("winston"));
 const secrets_1 = require("./util/secrets");
+const connect_session_sequelize_1 = __importDefault(require("connect-session-sequelize"));
 // Controllers (route handlers)
 const userController = __importStar(require("./controllers/user.controller"));
 const payStackController = __importStar(require("./controllers/payStack.controller"));
@@ -122,10 +123,10 @@ app.use(express_session_1.default({
     resave: false,
     saveUninitialized: false,
     secret: secrets_1.SESSION_SECRET,
-    // store: new (SequelizeStore(session.Store))({
-    // 	db: sequelize, // Use your Sequelize instance
-    // 	tableName: "sessions", // Table name to store sessions in your database
-    // }),
+    store: new (connect_session_sequelize_1.default(express_session_1.default.Store))({
+        db: sequelize_1.default,
+        tableName: "sessions", // Table name to store sessions in your database
+    }),
     cookie: {
         secure: true,
         maxAge: 1000 * 60 * 30,
@@ -142,9 +143,9 @@ const logger = winston_1.default.createLogger({
  * Primary app routes.
  */
 app.get("/", (req, res) => {
-    var _a, _b;
-    if ((_a = req === null || req === void 0 ? void 0 : req.session) === null || _a === void 0 ? void 0 : _a.userId) {
-        return res.json({ valid: true, userId: (_b = req === null || req === void 0 ? void 0 : req.session) === null || _b === void 0 ? void 0 : _b.userId });
+    var _a;
+    if (req === null || req === void 0 ? void 0 : req.user) {
+        return res.json({ valid: true, userId: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.id });
     }
     else {
         return res.json({ valid: false });

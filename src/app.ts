@@ -26,7 +26,7 @@ import * as userDestinationRequestController from "./controllers/user-destinatio
 import * as passportConfig from "./config/passport";
 
 import sequelize from "./sequelize";
-import { init as initUserModel } from "./models/user.model";
+import { UserInstance, init as initUserModel } from "./models/user.model";
 import { init as initWalletModel } from "./models/wallet.model";
 import { init as initWalletTransactionModel } from "./models/walletTransaction.model";
 import { init as initTransactionModel } from "./models/transaction.model";
@@ -104,10 +104,10 @@ app.use(
 		resave: false,
 		saveUninitialized: false,
 		secret: SESSION_SECRET,
-		// store: new (SequelizeStore(session.Store))({
-		// 	db: sequelize, // Use your Sequelize instance
-		// 	tableName: "sessions", // Table name to store sessions in your database
-		// }),
+		store: new (SequelizeStore(session.Store))({
+			db: sequelize, // Use your Sequelize instance
+			tableName: "sessions", // Table name to store sessions in your database
+		}),
 		cookie: {
 			secure: true,
 			maxAge: 1000 * 60 * 30,
@@ -127,8 +127,8 @@ const logger = winston.createLogger({
  * Primary app routes.
  */
 app.get("/", (req: Request, res: Response) => {
-	if (req?.session?.userId) {
-		return res.json({ valid: true, userId: req?.session?.userId });
+	if (req?.user) {
+		return res.json({ valid: true, userId: (req?.user as UserInstance)?.id });
 	} else {
 		return res.json({ valid: false });
 	}

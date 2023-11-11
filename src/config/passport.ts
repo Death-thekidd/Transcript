@@ -3,33 +3,21 @@ import passportLocal from "passport-local";
 import { find } from "lodash";
 
 // import { User, UserType } from '../models/User';
-import { User, UserDocument } from "../models/user.model";
+import { User, UserInstance } from "../models/user.model";
 import { Request, Response, NextFunction } from "express";
-import { NativeError } from "mongoose";
-import sequelize from "../sequelize";
 
 const LocalStrategy = passportLocal.Strategy;
 
-passport.serializeUser<any, any>((req, user, done) => {
-	done(undefined, user);
+passport.serializeUser<any, any>((req, user: UserInstance, done) => {
+	done(undefined, user.id);
 });
 
-passport.deserializeUser(async (userObj: Record<string, unknown>, done) => {
+passport.deserializeUser(async (id: string, done) => {
 	try {
-		console.log(userObj);
-
-		const user = await User.findByPk(userObj.id as number);
-
-		if (!user) {
-			// Handle the case where the user is not found
-			done(null, false);
-		} else {
-			// User found, you can proceed with authentication
-			done(null, user);
-		}
-	} catch (error) {
-		// Handle any errors that occurred during the query
-		done(error, false);
+		const user = await User.findByPk(id);
+		done(null, user);
+	} catch (err) {
+		done(err, null);
 	}
 });
 

@@ -19,24 +19,15 @@ const passport_local_1 = __importDefault(require("passport-local"));
 const user_model_1 = require("../models/user.model");
 const LocalStrategy = passport_local_1.default.Strategy;
 passport_1.default.serializeUser((req, user, done) => {
-    done(undefined, user);
+    done(undefined, user.id);
 });
-passport_1.default.deserializeUser((userObj, done) => __awaiter(void 0, void 0, void 0, function* () {
+passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(userObj);
-        const user = yield user_model_1.User.findByPk(userObj.id);
-        if (!user) {
-            // Handle the case where the user is not found
-            done(null, false);
-        }
-        else {
-            // User found, you can proceed with authentication
-            done(null, user);
-        }
+        const user = yield user_model_1.User.findByPk(id);
+        done(null, user);
     }
-    catch (error) {
-        // Handle any errors that occurred during the query
-        done(error, false);
+    catch (err) {
+        done(err, null);
     }
 }));
 /**
