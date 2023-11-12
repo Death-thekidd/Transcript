@@ -35,6 +35,8 @@ export const SENDER_PASS = process.env["SENDER_PASS"];
 export const PAYSTACK_PUBLIC_KEY = process.env["PAYSTACK_PUBLIC_KEY"];
 export const PAYSTACK_SECRET_KEY = process.env["PAYSTACK_SECRET_KEY"];
 
+export const URL_ORIGIN = process.env["URL_ORIGIN"];
+
 if (!SESSION_SECRET) {
 	logger.error("No client secret. Set SESSION_SECRET environment variable.");
 	process.exit(1);

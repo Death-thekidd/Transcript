@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import session from "express-session";
 import passport from "passport";
 import winston from "winston";
-import { SESSION_SECRET } from "./util/secrets";
+import { SESSION_SECRET, URL_ORIGIN } from "./util/secrets";
 import SequelizeStore from "connect-session-sequelize";
 
 // Controllers (route handlers)
@@ -44,7 +44,11 @@ import { seedRolesAndPrivileges } from "./seeders/role.seeder";
 // Create Express server
 const app = express();
 
-const whitelist = ["https://transcript.dtkapp.com.ng", "http://localhost:5173"];
+const whitelist = [
+	"https://transcript.dtkapp.com.ng",
+	"http://localhost:5173",
+	URL_ORIGIN,
+];
 const corsOptions = {
 	origin: function (origin: any, callback: any) {
 		if (whitelist.indexOf(origin) !== -1) {
@@ -145,23 +149,43 @@ app.get("/", (req: Request, res: Response) => {
 		return res.json({ valid: false, user: req?.isAuthenticated() });
 	}
 });
-app.get("/users", userController.getUsers);
-app.get("/user/:id", userController.getUser);
+app.get("/users", passportConfig.isAuthenticated, userController.getUsers);
+app.get("/user/:id", passportConfig.isAuthenticated, userController.getUser);
 app.post("/login", userController.postLogin);
 app.post("/logout", userController.logout);
 app.post("/forgot", userController.postForgot);
 app.post("/signup", userController.postSignup);
 
-app.post("/create-role", roleController.createRole);
+app.post(
+	"/create-role",
+	passportConfig.isAuthenticated,
+	roleController.createRole
+);
 app.get("/roles", roleController.getRoles);
 app.get("/role/:id", roleController.getRole);
-app.patch("/edit-role/:id", roleController.editRole);
-app.delete("/delete-role/:id", roleController.deleteRole);
+app.patch(
+	"/edit-role/:id",
+	passportConfig.isAuthenticated,
+	roleController.editRole
+);
+app.delete(
+	"/delete-role/:id",
+	passportConfig.isAuthenticated,
+	roleController.deleteRole
+);
 
 app.get("/privileges", privilegeController.getPrivileges);
 
-app.patch("/update-user/:id", userController.UpdateUser);
-app.delete("/delete-user/:id", userController.postDeleteUser);
+app.patch(
+	"/update-user/:id",
+	passportConfig.isAuthenticated,
+	userController.UpdateUser
+);
+app.delete(
+	"/delete-user/:id",
+	passportConfig.isAuthenticated,
+	userController.postDeleteUser
+);
 
 app.post("/initialize-payment", payStackController.initializePayment);
 app.post("/verify-payment", payStackController.verifyPayment);
@@ -184,75 +208,139 @@ app.get("/transaction/:id", transactionController.getTransaction);
 
 app.get("/colleges", collegeController.getColleges);
 app.get("/college/:id", collegeController.getCollege);
-app.post("/create-college", collegeController.createCollege);
-app.patch("/edit-college/:id", collegeController.editCollege);
-app.delete("/delete-college/:id", collegeController.deleteCollege);
+app.post(
+	"/create-college",
+	passportConfig.isAuthenticated,
+	collegeController.createCollege
+);
+app.patch(
+	"/edit-college/:id",
+	passportConfig.isAuthenticated,
+	collegeController.editCollege
+);
+app.delete(
+	"/delete-college/:id",
+	passportConfig.isAuthenticated,
+	collegeController.deleteCollege
+);
 
 app.get("/departments", departmentController.getDepartments);
 app.get("/department/:id", departmentController.getDepartment);
-app.post("/create-department", departmentController.createDepartment);
-app.patch("/edit-department/:id", departmentController.editDepartment);
-app.delete("/delete-department/:id", departmentController.deleteDepartment);
+app.post(
+	"/create-department",
+	passportConfig.isAuthenticated,
+	departmentController.createDepartment
+);
+app.patch(
+	"/edit-department/:id",
+	passportConfig.isAuthenticated,
+	departmentController.editDepartment
+);
+app.delete(
+	"/delete-department/:id",
+	passportConfig.isAuthenticated,
+	departmentController.deleteDepartment
+);
 
-app.get("/destinations", destinationController.getDestinations);
-app.get("/destination/:id", destinationController.getDestination);
-app.post("/create-destination", destinationController.createDestination);
-app.patch("/edit-destination/:id", destinationController.editDestination);
-app.delete("/delete-destination/:id", destinationController.deleteDestination);
+app.get(
+	"/destinations",
+	passportConfig.isAuthenticated,
+	destinationController.getDestinations
+);
+app.get(
+	"/destination/:id",
+	passportConfig.isAuthenticated,
+	destinationController.getDestination
+);
+app.post(
+	"/create-destination",
+	passportConfig.isAuthenticated,
+	destinationController.createDestination
+);
+app.patch(
+	"/edit-destination/:id",
+	passportConfig.isAuthenticated,
+	destinationController.editDestination
+);
+app.delete(
+	"/delete-destination/:id",
+	passportConfig.isAuthenticated,
+	destinationController.deleteDestination
+);
 
-app.get("/transcript-types", transcriptTypeController.getTranscriptTypes);
-app.get("/transcript-type/:id", transcriptTypeController.getTranscriptType);
+app.get(
+	"/transcript-types",
+	passportConfig.isAuthenticated,
+	transcriptTypeController.getTranscriptTypes
+);
+app.get(
+	"/transcript-type/:id",
+	passportConfig.isAuthenticated,
+	transcriptTypeController.getTranscriptType
+);
 app.post(
 	"/create-transcript-type",
+	passportConfig.isAuthenticated,
 	transcriptTypeController.createTranscriptType
 );
 app.patch(
 	"/edit-transcript-type/:id",
+	passportConfig.isAuthenticated,
 	transcriptTypeController.editTranscriptType
 );
 app.delete(
 	"/delete-transcript-type/:id",
+	passportConfig.isAuthenticated,
 	transcriptTypeController.deleteTranscriptType
 );
 
 app.get(
 	"/transcript-requests",
+	passportConfig.isAuthenticated,
 	transcriptRequestController.getTranscriptRequests
 );
 app.get(
 	"/transcript-request/:id",
+	passportConfig.isAuthenticated,
 	transcriptRequestController.getTranscriptRequest
 );
 app.post(
 	"/submit-request",
+	passportConfig.isAuthenticated,
 	transcriptRequestController.submitTranscriptRequest
 );
 app.patch(
 	"/update-transcript-request-status/:id",
+	passportConfig.isAuthenticated,
 	transcriptRequestController.updateTranscriptRequestStaus
 );
 app.delete(
 	"/delete-transcript-request/:id",
+	passportConfig.isAuthenticated,
 	transcriptRequestController.deleteTranscriptRequest
 );
 
 app.get(
 	"/destination-requests",
+	passportConfig.isAuthenticated,
 	userDestinationRequestController.getDestinationRequests
 );
 
 app.get(
 	"/destination-request/:id",
+	passportConfig.isAuthenticated,
 	userDestinationRequestController.getDestinationRequest
 );
 
 app.post(
 	"/submit-destination-request",
+	passportConfig.isAuthenticated,
 	userDestinationRequestController.submitDestinationRequest
 );
 
 app.patch(
 	"/accept-destination-request/:id",
+	passportConfig.isAuthenticated,
 	userDestinationRequestController.acceptDestinationRequest
 );
 
