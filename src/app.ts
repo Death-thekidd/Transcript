@@ -130,7 +130,7 @@ app.get("/", (req: Request, res: Response) => {
 	if (req?.user) {
 		return res.json({ valid: true, userId: (req?.user as UserInstance)?.id });
 	} else {
-		return res.json({ valid: false });
+		return res.json({ valid: false, user: req?.isAuthenticated() });
 	}
 });
 app.get("/users", userController.getUsers);

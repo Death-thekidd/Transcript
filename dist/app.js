@@ -146,7 +146,7 @@ app.get("/", (req, res) => {
         return res.json({ valid: true, userId: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.id });
     }
     else {
-        return res.json({ valid: false });
+        return res.json({ valid: false, user: req === null || req === void 0 ? void 0 : req.isAuthenticated() });
     }
 });
 app.get("/users", userController.getUsers);
