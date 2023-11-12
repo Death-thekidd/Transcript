@@ -44,7 +44,20 @@ import { seedRolesAndPrivileges } from "./seeders/role.seeder";
 // Create Express server
 const app = express();
 
-app.use(cors());
+const whitelist = ["https://transcript.dtkapp.com.ng", "http://localhost:5173"];
+const corsOptions = {
+	origin: function (origin: any, callback: any) {
+		if (whitelist.indexOf(origin) !== -1) {
+			callback(null, true);
+		} else {
+			callback(new Error("Not allowed by CORS"));
+		}
+	},
+	methods: ["POST", "PATCH", "GET", "DELETE", "OPTIONS", "HEAD"],
+	credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Initialize models
 initUserModel();

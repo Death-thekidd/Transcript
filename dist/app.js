@@ -69,7 +69,20 @@ const user_seeder_1 = require("./seeders/user.seeder");
 const role_seeder_1 = require("./seeders/role.seeder");
 // Create Express server
 const app = express_1.default();
-app.use(cors_1.default());
+const whitelist = ["https://transcript.dtkapp.com.ng", "http://localhost:5173"];
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: ["POST", "PATCH", "GET", "DELETE", "OPTIONS", "HEAD"],
+    credentials: true,
+};
+app.use(cors_1.default(corsOptions));
 // Initialize models
 user_model_1.init();
 role_model_1.init();
