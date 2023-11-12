@@ -126,7 +126,6 @@ app.use(express_session_1.default({
         tableName: "sessions", // Table name to store sessions in your database
     }),
     cookie: {
-        secure: true,
         maxAge: 1000 * 60 * 30,
     },
 }));

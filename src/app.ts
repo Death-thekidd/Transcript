@@ -109,7 +109,6 @@ app.use(
 			tableName: "sessions", // Table name to store sessions in your database
 		}),
 		cookie: {
-			secure: true,
 			maxAge: 1000 * 60 * 30,
 		},
 	})
