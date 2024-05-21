@@ -1,5 +1,6 @@
+// src/controllers/transactionController.ts
 import { Request, Response, NextFunction } from "express";
-import { Transaction } from "../models/transaction.model";
+import * as transactionService from "../services/transaction.service";
 
 /**
  * Get all WalletTransactions
@@ -9,10 +10,10 @@ export const getTransactions = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const Transactions = await Transaction.findAll();
-		return res.status(200).json({ data: Transactions });
+		const transactions = await transactionService.getAllTransactions();
+		return res.status(200).json({ data: transactions });
 	} catch (error) {
 		next(error);
 	}
@@ -26,10 +27,10 @@ export const getTransaction = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
 		const id = req.params.id;
-		const transaction = await Transaction.findByPk(id);
+		const transaction = await transactionService.getTransactionById(id);
 
 		if (!transaction) {
 			return res.status(404).json({ message: "Transaction not found" });

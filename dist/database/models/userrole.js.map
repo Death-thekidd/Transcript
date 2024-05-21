@@ -1,0 +1,1 @@
+{"version":3,"file":"userrole.js","sourceRoot":"","sources":["../../../src/database/models/userrole.ts"],"names":[],"mappings":";;;;;AAAA,yCAAyD;AACzD,+DAAuC;AASvC,MAAM,QAAS,SAAQ,iBAAyB;CAU/C;AACD,QAAQ,CAAC,IAAI,CACZ;IACC,MAAM,EAAE,qBAAS,CAAC,IAAI;IACtB,MAAM,EAAE,qBAAS,CAAC,IAAI;CACtB,EACD;IACC,SAAS,EAAE,oBAAU;IACrB,SAAS,EAAE,UAAU;CACrB,CACD,CAAC;AACF,kBAAe,QAAQ,CAAC"}

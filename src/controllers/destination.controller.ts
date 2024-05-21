@@ -1,127 +1,91 @@
-import { validationResult } from "express-validator";
+// controllers/destinationController.ts
 import { Request, Response, NextFunction } from "express";
-import { College } from "../models/college.model";
-import { Destination } from "../models/destination.model";
+import { validationResult } from "express-validator";
+import * as destinationService from "../services/destination.service";
 
-/**
- * Get all destinations
- * @route GET /destinations
- */
 export const getDestinations = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const destinations = await Destination.findAll();
+		const destinations = await destinationService.getAllDestinations();
 		return res.status(200).json({ data: destinations });
 	} catch (error) {
 		next(error);
 	}
 };
 
-/**
- * Get destination by ID
- * @route GET /destination/:id
- */
 export const getDestination = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const destinationId = req.params.id;
-		const destination = await Destination.findByPk(destinationId);
-
+		const destination = await destinationService.getDestinationById(
+			req.params.id
+		);
 		if (!destination) {
 			return res.status(404).json({ message: "Destination not found" });
 		}
-
 		return res.status(200).json({ data: destination });
 	} catch (error) {
 		next(error);
 	}
 };
 
-/**
- * Create new Destination
- * @route POST /create-destination
- */
 export const createDestination = async (
 	req: Request,
-	res: Response,
-	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+	res: Response
+): Promise<Response> => {
 	try {
 		const errors = validationResult(req);
-
 		if (!errors.isEmpty()) {
-			// Return validation errors as JSON
 			return res.status(400).json({ errors: errors.array() });
 		}
-
-		const destination = await Destination.create({
-			name: req.body.name,
-			rate: req.body.rate,
-			deliveryMethod: req.body.deliveryMethod,
-		});
+		const { name, rate, deliveryMethod } = req.body;
+		const destination = await destinationService.createDestination(
+			name,
+			rate,
+			deliveryMethod
+		);
 		return res
-			.status(200)
-			.json({ message: "Destination created succesfully", data: destination });
+			.status(201)
+			.json({ message: "Destination created successfully", data: destination });
 	} catch (error) {
-		return res.status(500).json({ error: error });
+		return res.status(500).json({ error: error.message });
 	}
 };
 
-/**
- * Edit existing destination
- * @route PATCH /edit-destination/:id
- */
 export const editDestination = async (
 	req: Request,
-	res: Response,
-	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
-	const id: string = req.params.id;
+	res: Response
+): Promise<Response> => {
 	try {
-		const result = await Destination.update(
-			{ ...req.body },
-			{ where: { id: id } }
+		const updatedRowsCount = await destinationService.updateDestination(
+			req.params.id,
+			req.body
 		);
-
-		if (result[0] === 0) {
-			return res.status(404).json({ message: "college not found" });
+		if (updatedRowsCount === 0) {
+			return res.status(404).json({ message: "Destination not found" });
 		}
-		return res
-			.status(204)
-			.json({ message: "destination updated successfully" });
+		return res.status(204).json({ message: "Destination updated successfully" });
 	} catch (error) {
-		return res.status(500).json({ message: "Error editing college", error });
+		return res.status(500).json({ message: "Error editing destination", error });
 	}
 };
 
-/**
- * Delete destination
- * @route DELETE /delete-destination/:id
- */
 export const deleteDestination = async (
 	req: Request,
-	res: Response,
-	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+	res: Response
+): Promise<Response> => {
 	try {
-		const college = await College.findOne({
-			where: { id: req.params.id },
-		});
-
-		if (college) {
-			// Delete the record
-			await college.destroy();
-			return res.status(204).json({ message: "college deleted successfully." });
-		} else {
-			return res.status(404).json({ message: "college not found." });
-		}
+		await destinationService.deleteDestination(req.params.id);
+		return res.status(204).json({ message: "Destination deleted successfully" });
 	} catch (error) {
-		return res.status(500).json({ message: "Error deleting college", error });
+		if (error.message === "Destination not found") {
+			return res.status(404).json({ message: "Destination not found" });
+		}
+		return res.status(500).json({ message: "Error deleting destination", error });
 	}
 };

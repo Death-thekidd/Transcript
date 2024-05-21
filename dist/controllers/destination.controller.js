@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,15 +30,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteDestination = exports.editDestination = exports.createDestination = exports.getDestination = exports.getDestinations = void 0;
 const express_validator_1 = require("express-validator");
-const college_model_1 = require("../models/college.model");
-const destination_model_1 = require("../models/destination.model");
-/**
- * Get all destinations
- * @route GET /destinations
- */
+const destinationService = __importStar(require("../services/destination.service"));
 const getDestinations = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const destinations = yield destination_model_1.Destination.findAll();
+        const destinations = yield destinationService.getAllDestinations();
         return res.status(200).json({ data: destinations });
     }
     catch (error) {
@@ -27,14 +41,9 @@ const getDestinations = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 exports.getDestinations = getDestinations;
-/**
- * Get destination by ID
- * @route GET /destination/:id
- */
 const getDestination = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const destinationId = req.params.id;
-        const destination = yield destination_model_1.Destination.findByPk(destinationId);
+        const destination = yield destinationService.getDestinationById(req.params.id);
         if (!destination) {
             return res.status(404).json({ message: "Destination not found" });
         }
@@ -45,71 +54,46 @@ const getDestination = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.getDestination = getDestination;
-/**
- * Create new Destination
- * @route POST /create-destination
- */
-const createDestination = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const createDestination = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const errors = express_validator_1.validationResult(req);
         if (!errors.isEmpty()) {
-            // Return validation errors as JSON
             return res.status(400).json({ errors: errors.array() });
         }
-        const destination = yield destination_model_1.Destination.create({
-            name: req.body.name,
-            rate: req.body.rate,
-            deliveryMethod: req.body.deliveryMethod,
-        });
+        const { name, rate, deliveryMethod } = req.body;
+        const destination = yield destinationService.createDestination(name, rate, deliveryMethod);
         return res
-            .status(200)
-            .json({ message: "Destination created succesfully", data: destination });
+            .status(201)
+            .json({ message: "Destination created successfully", data: destination });
     }
     catch (error) {
-        return res.status(500).json({ error: error });
+        return res.status(500).json({ error: error.message });
     }
 });
 exports.createDestination = createDestination;
-/**
- * Edit existing destination
- * @route PATCH /edit-destination/:id
- */
-const editDestination = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
+const editDestination = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield destination_model_1.Destination.update(Object.assign({}, req.body), { where: { id: id } });
-        if (result[0] === 0) {
-            return res.status(404).json({ message: "college not found" });
+        const updatedRowsCount = yield destinationService.updateDestination(req.params.id, req.body);
+        if (updatedRowsCount === 0) {
+            return res.status(404).json({ message: "Destination not found" });
         }
-        return res
-            .status(204)
-            .json({ message: "destination updated successfully" });
+        return res.status(204).json({ message: "Destination updated successfully" });
     }
     catch (error) {
-        return res.status(500).json({ message: "Error editing college", error });
+        return res.status(500).json({ message: "Error editing destination", error });
     }
 });
 exports.editDestination = editDestination;
-/**
- * Delete destination
- * @route DELETE /delete-destination/:id
- */
-const deleteDestination = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteDestination = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const college = yield college_model_1.College.findOne({
-            where: { id: req.params.id },
-        });
-        if (college) {
-            // Delete the record
-            yield college.destroy();
-            return res.status(204).json({ message: "college deleted successfully." });
-        }
-        else {
-            return res.status(404).json({ message: "college not found." });
-        }
+        yield destinationService.deleteDestination(req.params.id);
+        return res.status(204).json({ message: "Destination deleted successfully" });
     }
     catch (error) {
-        return res.status(500).json({ message: "Error deleting college", error });
+        if (error.message === "Destination not found") {
+            return res.status(404).json({ message: "Destination not found" });
+        }
+        return res.status(500).json({ message: "Error deleting destination", error });
     }
 });
 exports.deleteDestination = deleteDestination;

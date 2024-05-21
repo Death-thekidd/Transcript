@@ -6,9 +6,7 @@ if (fs.existsSync(".env")) {
 	logger.debug("Using .env file to supply config environment variables");
 	dotenv.config({ path: ".env" });
 } else {
-	logger.debug(
-		"Using .env.example file to supply config environment variables"
-	);
+	logger.debug("Using .env.example file to supply config environment variables");
 	dotenv.config({ path: ".env.example" }); // you can delete this after you create your own .env file!
 }
 export const ENVIRONMENT = process.env.NODE_ENV;
@@ -27,7 +25,7 @@ export const MYSQL_DB_USER = prod
 	: process.env["MYSQL_DB_USER_LOCAL"];
 export const MYSQL_DB_PASSWORD = prod
 	? process.env["MYSQL_DB_PASSWORD"]
-	: process.env["MYSQL_DB_PASSWORD_LOCAL"];
+	: process.env["MYSQL_DB_PASSWORD_LOCAL"] || null;
 
 export const SENDER_EMAIL = process.env["SENDER_EMAIL"];
 export const SENDER_PASS = process.env["SENDER_PASS"];
@@ -46,9 +44,7 @@ if (!MYSQL_DB_HOST) {
 	if (prod) {
 		logger.error("No mysql host. Set MYSQL_DB_HOST environment variable.");
 	} else {
-		logger.error(
-			"No mysql host. Set MYSQL_DB_HOST_LOCAL environment variable."
-		);
+		logger.error("No mysql host. Set MYSQL_DB_HOST_LOCAL environment variable.");
 	}
 	process.exit(1);
 }

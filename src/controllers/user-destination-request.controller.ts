@@ -1,10 +1,10 @@
-import { User, UserInstance } from "../models/user.model";
-import { validationResult } from "express-validator";
+// src/controllers/destinationRequestController.ts
 import { Request, Response, NextFunction } from "express";
+import { validationResult } from "express-validator";
 import async from "async";
-import { UserDestinationRequestInstance } from "../models/user-destination-request.model";
-import { UserDestinationRequest } from "../models/user-destination-request.model";
-import { where } from "sequelize";
+import * as destinationRequestService from "../services/userDestinationRequest.service";
+import UserDestinationRequest from "../database/models/userdestinationrequest";
+import { UserAttributes } from "../database/models/user";
 
 /**
  * Get all destinations
@@ -14,12 +14,14 @@ export const getDestinationRequests = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const destinationRequests = await UserDestinationRequest.findAll();
+		const destinationRequests: UserDestinationRequest[] =
+			await destinationRequestService.getAllDestinationRequests();
 		return res.status(200).json({ data: destinationRequests });
 	} catch (error) {
 		next(error);
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -31,12 +33,13 @@ export const getDestinationRequest = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const destinationRequestId = req.params.id;
-		const destinationRequest = await UserDestinationRequest.findByPk(
-			destinationRequestId
-		);
+		const destinationRequestId: string = req.params.id;
+		const destinationRequest: UserDestinationRequest | null =
+			await destinationRequestService.getDestinationRequestById(
+				destinationRequestId
+			);
 
 		if (!destinationRequest) {
 			return res.status(404).json({ message: "Destination Request not found" });
@@ -45,6 +48,7 @@ export const getDestinationRequest = async (
 		return res.status(200).json({ data: destinationRequest });
 	} catch (error) {
 		next(error);
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -56,51 +60,49 @@ export const submitDestinationRequest = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
 		const errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
-			// Return validation errors as JSON
 			return res.status(400).json({ errors: errors.array() });
 		}
 
 		async.waterfall(
 			[
 				async function checkUser(
-					done: (err: Error, user: UserInstance) => void
+					done: (err: Error | null, user: UserAttributes | null) => void
 				) {
-					const user = await User.findByPk(req.body.userId);
+					const user = await destinationRequestService.findUserById(req.body.userId);
 					if (!user) {
-						return done(new Error("User not found."), null); // Pass an error to the next function
+						return done(new Error("User not found."), null);
 					}
-					done(undefined, user);
+					done(null, user);
 				},
 				async function saveRequest(
-					user: UserInstance,
+					user: UserAttributes,
 					done: (
-						err: Error,
-						request: UserDestinationRequestInstance,
-						user: UserInstance
+						err: Error | null,
+						request: UserDestinationRequest | null,
+						user: UserAttributes | null
 					) => void
 				) {
 					try {
 						const { name, userId } = req.body;
-						const request = await UserDestinationRequest.create({
+						const request = await destinationRequestService.createDestinationRequest(
 							name,
-							userId,
-							status: "pending",
-						});
+							userId
+						);
 						done(null, request, user);
 					} catch (error) {
-						console.error("Unable to create Destination request : ", error);
-						return done(error, null, null); // Pass an error to the next function
+						console.error("Unable to create Destination request: ", error);
+						return done(error, null, null);
 					}
 				},
 			],
-			(err, request: UserDestinationRequestInstance) => {
+			(err: Error | null, request: UserDestinationRequest | null) => {
 				if (err) {
-					return next(err); // Handle errors at the end of the waterfall
+					return next(err);
 				}
 
 				return res.status(201).json({
@@ -110,7 +112,7 @@ export const submitDestinationRequest = async (
 			}
 		);
 	} catch (error) {
-		return res.status(500).json({ error: error });
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -122,15 +124,18 @@ export const acceptDestinationRequest = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const id = req.params.id;
-		await UserDestinationRequest.update(
-			{ status: "accepted" },
-			{ where: { id: id } }
-		);
-		return res.status(204).json({ message: "Destination accepted" });
+		const id: string = req.params.id;
+		const result: [number, UserDestinationRequest[]] =
+			await destinationRequestService.acceptDestinationRequestById(id);
+
+		if (result[0] === 0) {
+			return res.status(404).json({ message: "Destination Request not found" });
+		}
+		return res.status(200).json({ message: "Destination accepted" });
 	} catch (error) {
-		return res.status(500).json({ error: error });
+		next(error);
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };

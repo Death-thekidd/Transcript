@@ -16,14 +16,14 @@ exports.isAuthenticated = void 0;
 const passport_1 = __importDefault(require("passport"));
 const passport_local_1 = __importDefault(require("passport-local"));
 // import { User, UserType } from '../models/User';
-const user_model_1 = require("../models/user.model");
+const user_1 = __importDefault(require("../database/models/user"));
 const LocalStrategy = passport_local_1.default.Strategy;
 passport_1.default.serializeUser((req, user, done) => {
     done(undefined, user.id);
 });
 passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield user_model_1.User.findByPk(id);
+        const user = yield user_1.default.findByPk(id);
         done(null, user);
     }
     catch (err) {
@@ -35,7 +35,7 @@ passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 
  */
 passport_1.default.use(new LocalStrategy({ usernameField: "email" }, (email, password, done) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield user_model_1.User.findOne({
+        const user = yield user_1.default.findOne({
             where: { email: email.toLowerCase() },
         });
         if (!user) {

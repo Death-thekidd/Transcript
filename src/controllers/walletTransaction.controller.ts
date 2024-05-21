@@ -1,5 +1,6 @@
+// src/controllers/walletTransactionController.ts
 import { Request, Response, NextFunction } from "express";
-import { WalletTransaction } from "../models/walletTransaction.model";
+import * as walletTransactionService from "../services/walletTransaction.service";
 
 /**
  * Get all WalletTransactions
@@ -9,12 +10,14 @@ export const getWalletTransactions = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const walletTransactions = await WalletTransaction.findAll();
+		const walletTransactions =
+			await walletTransactionService.getAllWalletTransactions();
 		return res.status(200).json({ data: walletTransactions });
 	} catch (error) {
 		next(error);
+		return res.status(500).json({ message: "Internal Server Error" });
 	}
 };
 
@@ -26,17 +29,19 @@ export const getWalletTransaction = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
 		const id = req.params.id;
-		const wallet = await WalletTransaction.findByPk(id);
+		const walletTransaction =
+			await walletTransactionService.getWalletTransactionById(id);
 
-		if (!wallet) {
-			return res.status(404).json({ message: "Wallet not found" });
+		if (!walletTransaction) {
+			return res.status(404).json({ message: "Wallet Transaction not found" });
 		}
 
-		return res.status(200).json({ data: wallet });
+		return res.status(200).json({ data: walletTransaction });
 	} catch (error) {
 		next(error);
+		return res.status(500).json({ message: "Internal Server Error" });
 	}
 };

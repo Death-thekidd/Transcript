@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,42 +30,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCollege = exports.editCollege = exports.createCollege = exports.getCollege = exports.getColleges = void 0;
 const express_validator_1 = require("express-validator");
-const college_model_1 = require("../models/college.model");
-const department_model_1 = require("../models/department.model");
-/**
- * Get all college
- * @route GET /colleges
- */
+const collegeService = __importStar(require("../services/college.service"));
 const getColleges = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const colleges = yield college_model_1.College.findAll({
-            include: department_model_1.Department,
-        });
-        const collegeData = colleges.map((college) => {
-            const departments = college.Departments
-                ? college.Departments.map((department) => department.name)
-                : [];
-            return {
-                id: college.id,
-                name: college.name,
-                departments,
-            };
-        });
-        return res.status(200).json({ data: collegeData });
+        const colleges = yield collegeService.getAllColleges();
+        return res.status(200).json({ data: colleges });
     }
     catch (error) {
         next(error);
     }
 });
 exports.getColleges = getColleges;
-/**
- * Get college by ID
- * @route GET /college/:id
- */
 const getCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const collegeId = req.params.id;
-        const college = yield college_model_1.College.findByPk(collegeId);
+        const college = yield collegeService.getCollegeById(req.params.id);
         if (!college) {
             return res.status(404).json({ message: "College not found" });
         }
@@ -57,74 +54,44 @@ const getCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getCollege = getCollege;
-/**
- * Create new College
- * @route POST /create-college
- */
-const createCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const createCollege = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const errors = express_validator_1.validationResult(req);
         if (!errors.isEmpty()) {
-            // Return validation errors as JSON
             return res.status(400).json({ errors: errors.array() });
         }
-        const college = yield college_model_1.College.create({
-            name: req.body.name,
-        });
+        const college = yield collegeService.createCollege(req.body.name);
         return res
             .status(200)
-            .json({ message: "College created succesfully", data: college });
+            .json({ message: "College created successfully", data: college });
     }
     catch (error) {
-        return res.status(500).json({ error: error });
+        return res.status(500).json({ error: error.message });
     }
 });
 exports.createCollege = createCollege;
-/**
- * Edit existing college
- * @route PATCH /edit-college/:id
- */
-const editCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const { name } = req.body;
+const editCollege = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const college = yield college_model_1.College.findOne({ where: { id: id } });
-        if (college) {
-            // Update the record with new values
-            college.name = name;
-            // You can update multiple fields here
-            // Save the changes to the database
-            yield college.save();
-            return res.status(204).json({ message: "college updated successfully" });
-        }
-        else {
-            return res.status(404).json({ message: "college not found" });
-        }
+        yield collegeService.updateCollege(req.params.id, req.body.name);
+        return res.status(204).json({ message: "College updated successfully" });
     }
     catch (error) {
+        if (error.message === "College not found") {
+            return res.status(404).json({ message: "College not found" });
+        }
         return res.status(500).json({ message: "Error editing college", error });
     }
 });
 exports.editCollege = editCollege;
-/**
- * Delete college
- * @route DELETE /delete-college/:id
- */
-const deleteCollege = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteCollege = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const college = yield college_model_1.College.findOne({
-            where: { id: req.params.id },
-        });
-        if (college) {
-            // Delete the record
-            yield college.destroy();
-            return res.status(204).json({ message: "college deleted successfully." });
-        }
-        else {
-            return res.status(404).json({ message: "college not found." });
-        }
+        yield collegeService.deleteCollege(req.params.id);
+        return res.status(204).json({ message: "College deleted successfully" });
     }
     catch (error) {
+        if (error.message === "College not found") {
+            return res.status(404).json({ message: "College not found" });
+        }
         return res.status(500).json({ message: "Error deleting college", error });
     }
 });

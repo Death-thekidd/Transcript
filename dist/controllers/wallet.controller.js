@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,24 +27,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateWallet = exports.createWalletTransaction = exports.verifyPayment = exports.getWallet = exports.getWallets = void 0;
-const wallet_model_1 = require("../models/wallet.model");
-const walletTransaction_model_1 = require("../models/walletTransaction.model");
-const transaction_model_1 = require("../models/transaction.model");
-const secrets_1 = require("../util/secrets");
-const crypto_1 = __importDefault(require("crypto"));
-const user_model_1 = require("../models/user.model");
+exports.verifyPayment = exports.getWallet = exports.getWallets = void 0;
+const walletService = __importStar(require("../services/wallet.service"));
 /**
  * Get all Wallets
  * @route GET /wallets
  */
 const getWallets = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const wallets = yield wallet_model_1.Wallet.findAll();
+        const wallets = yield walletService.getAllWallets();
         return res.status(200).json({ data: wallets });
     }
     catch (error) {
@@ -40,7 +51,7 @@ exports.getWallets = getWallets;
 const getWallet = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userID = req.params.id;
-        const wallet = yield wallet_model_1.Wallet.findOne({ where: { UserID: userID } });
+        const wallet = yield walletService.getWalletByUserId(userID);
         if (!wallet) {
             return res.status(404).json({ message: "Wallet not found" });
         }
@@ -56,108 +67,22 @@ exports.getWallet = getWallet;
  * @route POST /verify-transaction
  */
 const verifyPayment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    //validate event
-    const hash = crypto_1.default
-        .createHmac("sha512", secrets_1.PAYSTACK_SECRET_KEY)
-        .update(JSON.stringify(req.body))
-        .digest("hex");
-    if (hash == req.headers["x-paystack-signature"]) {
-        // Retrieve the request's body
-        const event = req.body;
-        // Do something with event
-        if (event && event.event === "charge.success") {
-            const { status, currency, id, amount, customer } = event.data;
-            const transactionExist = yield transaction_model_1.Transaction.findOne({
-                where: { transactionID: id },
-            });
-            if (transactionExist) {
-                return res.status(409).send("Transaction Already Exist");
-            }
-            const user = yield user_model_1.User.findOne({ where: { email: customer.email } });
-            const wallet = yield validateUserWallet(user.id);
-            yield exports.createWalletTransaction(user.id, status, currency, amount, walletTransaction_model_1.TransactionType.DEPOSIT);
-            yield createTransaction(user.id, id, status, currency, amount, customer);
-            yield exports.updateWallet(user.id, amount);
-            return res
-                .status(200)
-                .json({ message: "wallet funded successfully", data: wallet });
+    try {
+        const isValid = walletService.verifyPaystackSignature(req.body, req.headers["x-paystack-signature"]);
+        if (!isValid) {
+            return res.status(400).json({ message: "Invalid signature" });
         }
+        const wallet = yield walletService.processPaystackEvent(req.body);
+        return res
+            .status(200)
+            .json({ message: "Wallet funded successfully", data: wallet });
     }
-    res.send(200);
+    catch (error) {
+        if (error.message === "Transaction Already Exists") {
+            return res.status(409).json({ message: error.message });
+        }
+        next(error);
+    }
 });
 exports.verifyPayment = verifyPayment;
-// Validating User wallet
-const validateUserWallet = (UserID) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // check if user have a wallet, else create wallet
-        const userWallet = yield wallet_model_1.Wallet.findOne({ where: { UserID: UserID } });
-        // If user wallet doesn't exist, create a new one
-        if (!userWallet) {
-            // create wallet
-            const wallet = yield wallet_model_1.Wallet.create({
-                UserID: UserID,
-            });
-            return wallet;
-        }
-        return userWallet;
-    }
-    catch (error) {
-        console.log(error);
-    }
-});
-// Create Wallet Transaction
-const createWalletTransaction = (UserID, status, currency, amount, type) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // create wallet transaction
-        const walletTransaction = yield walletTransaction_model_1.WalletTransaction.create({
-            amount,
-            UserID,
-            currency,
-            status,
-            isInFlow: true,
-            transactionType: type,
-        });
-        return walletTransaction;
-    }
-    catch (error) {
-        console.log(error);
-    }
-});
-exports.createWalletTransaction = createWalletTransaction;
-// Create Transaction
-const createTransaction = (UserID, id, status, currency, amount, customer) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // create transaction
-        const transaction = yield transaction_model_1.Transaction.create({
-            UserID,
-            transactionID: id,
-            name: customer.name,
-            email: customer.email,
-            amount,
-            currency,
-            paymentStatus: status,
-            paymentGateway: transaction_model_1.GatewayType.PAYSTACK,
-        });
-        return transaction;
-    }
-    catch (error) {
-        console.log(error);
-    }
-});
-// Update wallet
-const updateWallet = (UserID, amount) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // update wallet
-        const wallet = yield wallet_model_1.Wallet.findOne({
-            where: { UserID },
-        });
-        wallet.balance += amount;
-        wallet.save();
-        return wallet;
-    }
-    catch (error) {
-        console.log(error);
-    }
-});
-exports.updateWallet = updateWallet;
 //# sourceMappingURL=wallet.controller.js.map

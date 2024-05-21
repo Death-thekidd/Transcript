@@ -1,0 +1,1 @@
+{"version":3,"file":"roleprivilege.js","sourceRoot":"","sources":["../../../src/database/models/roleprivilege.ts"],"names":[],"mappings":";;;;;AAAA,yCAAyD;AACzD,+DAAuC;AAUvC,MAAM,aACL,SAAQ,iBAA8B;CAYtC;AACD,aAAa,CAAC,IAAI,CACjB;IACC,MAAM,EAAE,qBAAS,CAAC,IAAI;IACtB,WAAW,EAAE,qBAAS,CAAC,IAAI;CAC3B,EACD;IACC,SAAS,EAAE,oBAAU;IACrB,SAAS,EAAE,eAAe;CAC1B,CACD,CAAC;AACF,kBAAe,aAAa,CAAC"}

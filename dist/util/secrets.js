@@ -29,7 +29,7 @@ exports.MYSQL_DB_USER = prod
     : process.env["MYSQL_DB_USER_LOCAL"];
 exports.MYSQL_DB_PASSWORD = prod
     ? process.env["MYSQL_DB_PASSWORD"]
-    : process.env["MYSQL_DB_PASSWORD_LOCAL"];
+    : process.env["MYSQL_DB_PASSWORD_LOCAL"] || null;
 exports.SENDER_EMAIL = process.env["SENDER_EMAIL"];
 exports.SENDER_PASS = process.env["SENDER_PASS"];
 exports.PAYSTACK_PUBLIC_KEY = process.env["PAYSTACK_PUBLIC_KEY"];

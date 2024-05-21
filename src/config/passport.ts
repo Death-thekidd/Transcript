@@ -1,14 +1,13 @@
 import passport from "passport";
 import passportLocal from "passport-local";
-import { find } from "lodash";
 
 // import { User, UserType } from '../models/User';
-import { User, UserInstance } from "../models/user.model";
+import User from "../database/models/user";
 import { Request, Response, NextFunction } from "express";
 
 const LocalStrategy = passportLocal.Strategy;
 
-passport.serializeUser<any, any>((req, user: UserInstance, done) => {
+passport.serializeUser<any, any>((req, user: User, done) => {
 	done(undefined, user.id);
 });
 

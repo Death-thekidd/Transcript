@@ -1,6 +1,8 @@
-import { validationResult } from "express-validator";
+// src/controllers/transcriptTypeController.ts
 import { Request, Response, NextFunction } from "express";
-import { TranscriptType } from "../models/transcript-type.model";
+import { validationResult } from "express-validator";
+import * as transcriptTypeService from "../services/transcriptType.service";
+import TranscriptType from "../database/models/transcripttype";
 
 /**
  * Get all transcript types
@@ -10,12 +12,14 @@ export const getTranscriptTypes = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const transcriptTypes = await TranscriptType.findAll();
+		const transcriptTypes: TranscriptType[] =
+			await transcriptTypeService.getAllTranscriptTypes();
 		return res.status(200).json({ data: transcriptTypes });
 	} catch (error) {
 		next(error);
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -27,18 +31,20 @@ export const getTranscriptType = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const transcriptTypeId = req.params.id;
-		const transcriptType = await TranscriptType.findByPk(transcriptTypeId);
+		const transcriptTypeId: string = req.params.id;
+		const transcriptType: TranscriptType | null =
+			await transcriptTypeService.getTranscriptTypeById(transcriptTypeId);
 
 		if (!transcriptType) {
-			return res.status(404).json({ message: "Transcipt type not found" });
+			return res.status(404).json({ message: "Transcript type not found" });
 		}
 
 		return res.status(200).json({ data: transcriptType });
 	} catch (error) {
 		next(error);
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -50,7 +56,7 @@ export const createTranscriptType = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
 		const errors = validationResult(req);
 
@@ -59,16 +65,18 @@ export const createTranscriptType = async (
 			return res.status(400).json({ errors: errors.array() });
 		}
 
-		const transcriptType = await TranscriptType.create({
-			name: req.body.name,
-			amount: req.body.amount,
-		});
-		return res.status(200).json({
-			message: "Transcipt Type created succesfully",
+		const transcriptType: TranscriptType =
+			await transcriptTypeService.createTranscriptType(
+				req.body.name,
+				req.body.amount
+			);
+		return res.status(201).json({
+			message: "Transcript Type created successfully",
 			data: transcriptType,
 		});
 	} catch (error) {
-		return res.status(500).json({ error: error });
+		next(error);
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -80,21 +88,20 @@ export const editTranscriptType = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	const id: string = req.params.id;
 	try {
-		const result = await TranscriptType.update(
-			{ ...req.body },
-			{ where: { id: id } }
-		);
+		const result: [number, TranscriptType[]] =
+			await transcriptTypeService.updateTranscriptType(id, req.body);
 
 		if (result[0] === 0) {
-			return res.status(404).json({ message: "transcript type not found" });
+			return res.status(404).json({ message: "Transcript type not found" });
 		}
 		return res
-			.status(204)
-			.json({ message: "transcript type updated successfully" });
+			.status(200)
+			.json({ message: "Transcript type updated successfully" });
 	} catch (error) {
+		next(error);
 		return res
 			.status(500)
 			.json({ message: "Error editing transcript type", error });
@@ -109,22 +116,20 @@ export const deleteTranscriptType = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<Response<any, Record<string, any>>> => {
+): Promise<Response> => {
 	try {
-		const transcriptType = await TranscriptType.findOne({
-			where: { id: req.params.id },
-		});
+		const transcriptType: TranscriptType | null =
+			await transcriptTypeService.deleteTranscriptType(req.params.id);
 
 		if (transcriptType) {
-			// Delete the record
-			await transcriptType.destroy();
 			return res
-				.status(204)
-				.json({ message: "transcript type deleted successfully." });
+				.status(200)
+				.json({ message: "Transcript type deleted successfully." });
 		} else {
-			return res.status(404).json({ message: "transcript type not found." });
+			return res.status(404).json({ message: "Transcript type not found." });
 		}
 	} catch (error) {
+		next(error);
 		return res
 			.status(500)
 			.json({ message: "Error deleting transcript type", error });

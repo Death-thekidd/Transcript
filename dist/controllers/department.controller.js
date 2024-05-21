@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,136 +30,70 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteDepartment = exports.editDepartment = exports.createDepartment = exports.getDepartment = exports.getDepartments = void 0;
 const express_validator_1 = require("express-validator");
-const department_model_1 = require("../models/department.model");
-const college_model_1 = require("../models/college.model");
-/**
- * Get all departments
- * @route GET /departments
- */
+const departmentService = __importStar(require("../services/department.service"));
 const getDepartments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const departments = yield department_model_1.Department.findAll();
-        const departmentsNew = departments.map((department) => __awaiter(void 0, void 0, void 0, function* () {
-            console.log(department === null || department === void 0 ? void 0 : department.collegeId);
-            const college = yield college_model_1.College.findByPk(department === null || department === void 0 ? void 0 : department.collegeId);
-            return Object.assign(Object.assign({}, department === null || department === void 0 ? void 0 : department.dataValues), { collegeName: college === null || college === void 0 ? void 0 : college.name });
-        }));
-        const departmentsConsumed = yield Promise.all(departmentsNew);
-        return res.status(200).json({ data: departmentsConsumed });
+        const departments = yield departmentService.getAllDepartments();
+        return res.status(200).json({ data: departments });
     }
     catch (error) {
         next(error);
     }
 });
 exports.getDepartments = getDepartments;
-/**
- * Get department by ID
- * @route GET /department/:id
- */
 const getDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const departmentId = req.params.id;
-        const department = yield department_model_1.Department.findByPk(departmentId);
+        const department = yield departmentService.getDepartmentById(req.params.id);
         if (!department) {
             return res.status(404).json({ message: "Department not found" });
         }
-        const college = yield college_model_1.College.findByPk(department.collegeId);
-        return res
-            .status(200)
-            .json({ data: Object.assign(Object.assign({}, department.dataValues), { collegeName: college.name }) });
+        return res.status(200).json({ data: department });
     }
     catch (error) {
         next(error);
     }
 });
 exports.getDepartment = getDepartment;
-/**
- * Create new Department
- * @route POST /create-department
- */
-const createDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const createDepartment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const errors = express_validator_1.validationResult(req);
         if (!errors.isEmpty()) {
-            // Return validation errors as JSON
             return res.status(400).json({ errors: errors.array() });
         }
         const { name, college } = req.body;
-        const _college = yield college_model_1.College.findOne({
-            where: {
-                name: college,
-            },
-        });
-        if (!_college) {
-            return res
-                .status(404)
-                .json({ error: "Department does not have a college" });
-        }
-        const department = yield department_model_1.Department.create({
-            name: name,
-            collegeId: _college.id,
-        });
+        const department = yield departmentService.createDepartment(name, college);
         return res
             .status(201)
-            .json({ message: "Deapartment created succesfully", data: department });
+            .json({ message: "Department created successfully", data: department });
     }
     catch (error) {
-        return res.status(500).json({ error: error });
+        return res.status(500).json({ error: error.message });
     }
 });
 exports.createDepartment = createDepartment;
-/**
- * Edit existing department
- * @route PATCH /edit-department/:id
- */
-const editDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const { name } = req.body;
+const editDepartment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const department = yield department_model_1.Department.findOne({ where: { id: id } });
-        if (department) {
-            // Update the record with new values
-            department.name = name;
-            // You can update multiple fields here
-            // Save the changes to the database
-            yield department.save();
-            return res
-                .status(204)
-                .json({ message: "Department updated successfully" });
-        }
-        else {
+        const department = yield departmentService.updateDepartment(req.params.id, req.body.name);
+        if (!department) {
             return res.status(404).json({ message: "Department not found" });
         }
+        return res.status(204).json({ message: "Department updated successfully" });
     }
     catch (error) {
         return res.status(500).json({ message: "Error editing department", error });
     }
 });
 exports.editDepartment = editDepartment;
-/**
- * Delete department
- * @route DELETE /delete-department/:id
- */
-const deleteDepartment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteDepartment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const department = yield department_model_1.Department.findOne({
-            where: { id: req.params.id },
-        });
-        if (department) {
-            // Delete the record
-            yield department.destroy();
-            return res
-                .status(204)
-                .json({ message: "Department deleted successfully." });
-        }
-        else {
-            return res.status(404).json({ message: "Department not found." });
-        }
+        yield departmentService.deleteDepartment(req.params.id);
+        return res.status(204).json({ message: "Department deleted successfully" });
     }
     catch (error) {
-        return res
-            .status(500)
-            .json({ message: "Error deleting department", error });
+        if (error.message === "Department not found") {
+            return res.status(404).json({ message: "Department not found" });
+        }
+        return res.status(500).json({ message: "Error deleting department", error });
     }
 });
 exports.deleteDepartment = deleteDepartment;

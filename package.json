@@ -9,6 +9,8 @@
 	"author": "Divine Attah-Ohiemi",
 	"license": "MIT",
 	"scripts": {
+		"db-seed": "sequelize db:seed:all",
+		"db-migrate": "sequelize db:migrate",
 		"build-ts": "tsc",
 		"build": "npm run build-ts && npm run lint && npm run copy-static-assets",
 		"copy-static-assets": "ts-node copyStaticAssets.ts",
@@ -29,6 +31,8 @@
 		"@types/cors": "^2.8.13",
 		"@types/mongoose": "^5.11.97",
 		"@types/node-schedule": "^2.1.0",
+		"@types/sequelize": "^4.28.20",
+		"@types/uuid": "^9.0.8",
 		"async": "3.2.2",
 		"bcrypt-nodejs": "0.0.3",
 		"bluebird": "3.7.2",
