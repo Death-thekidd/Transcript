@@ -9,7 +9,7 @@ import {
 
 module.exports = {
 	username: MYSQL_DB_USER,
-	password: null,
+	password: MYSQL_DB_PASSWORD,
 	database: MYSQL_DB_NAME,
 	host: MYSQL_DB_HOST,
 	dialect: "mysql",

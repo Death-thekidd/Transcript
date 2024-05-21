@@ -17,7 +17,7 @@ const sequelizeConnection: Sequelize = new Sequelize(
 	}
 );
 
-console.log(MYSQL_DB_NAME, MYSQL_DB_USER, null, {
+console.log(MYSQL_DB_NAME, MYSQL_DB_USER, MYSQL_DB_PASSWORD, {
 	host: MYSQL_DB_HOST,
 	dialect: "mysql",
 	port: 3306,

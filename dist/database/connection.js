@@ -7,7 +7,7 @@ const sequelizeConnection = new sequelize_1.Sequelize(secrets_1.MYSQL_DB_NAME, s
     dialect: "mysql",
     port: 3306,
 });
-console.log(secrets_1.MYSQL_DB_NAME, secrets_1.MYSQL_DB_USER, null, {
+console.log(secrets_1.MYSQL_DB_NAME, secrets_1.MYSQL_DB_USER, secrets_1.MYSQL_DB_PASSWORD, {
     host: secrets_1.MYSQL_DB_HOST,
     dialect: "mysql",
     port: 3306,
