@@ -28,5 +28,6 @@ router.post("/logout", authController.logout);
 router.post("/signup", authController.postSignup);
 router.post("/reset/:token", authController.postReset);
 router.post("/forgot", authController.postForgot);
+router.get("/status", authController.getStatus);
 exports.default = router;
 //# sourceMappingURL=auth.router.js.map

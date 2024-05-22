@@ -4,6 +4,7 @@ import { body, check, validationResult } from "express-validator";
 import passport from "passport";
 import * as authService from "../services/auth.service";
 import { IVerifyOptions } from "passport-local";
+import { Identifier } from "sequelize";
 
 /**
  * Sign in using email and password.
@@ -153,5 +154,23 @@ export const postForgot = async (
 			.json({ message: "An e-mail has been sent with further instructions." });
 	} catch (error) {
 		next(error);
+	}
+};
+
+/**
+ * Gets user authentication status
+ * @route GET /status
+ */
+export const getStatus = async (
+	req: Request,
+	res: Response
+): Promise<Response> => {
+	if (req.isAuthenticated()) {
+		return res.json({
+			valid: true,
+			userId: (req.user as unknown as { id: Identifier }).id,
+		});
+	} else {
+		return res.json({ valid: false });
 	}
 };

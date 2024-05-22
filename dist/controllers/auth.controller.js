@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postForgot = exports.postReset = exports.postSignup = exports.logout = exports.postLogin = void 0;
+exports.getStatus = exports.postForgot = exports.postReset = exports.postSignup = exports.logout = exports.postLogin = void 0;
 const express_validator_1 = require("express-validator");
 const passport_1 = __importDefault(require("passport"));
 const authService = __importStar(require("../services/auth.service"));
@@ -151,4 +151,20 @@ const postForgot = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.postForgot = postForgot;
+/**
+ * Gets user authentication status
+ * @route GET /status
+ */
+const getStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (req.isAuthenticated()) {
+        return res.json({
+            valid: true,
+            userId: req.user.id,
+        });
+    }
+    else {
+        return res.json({ valid: false });
+    }
+});
+exports.getStatus = getStatus;
 //# sourceMappingURL=auth.controller.js.map
