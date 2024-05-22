@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/database/sequelize.config.js
-require("ts-node/register");
 const secrets_1 = require("../util/secrets");
 module.exports = {
     username: secrets_1.MYSQL_DB_USER,

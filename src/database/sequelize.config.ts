@@ -1,5 +1,4 @@
 // src/database/sequelize.config.js
-require("ts-node/register");
 import {
 	MYSQL_DB_NAME,
 	MYSQL_DB_HOST,
