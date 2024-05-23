@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { Request, Response, NextFunction } from "express";
 import session from "express-session";
-import passport from "passport";
+import passport from "./config/passport";
 import winston from "winston";
 import { SESSION_SECRET, URL_ORIGIN } from "./util/secrets";
 import SequelizeStore from "connect-session-sequelize";

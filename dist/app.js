@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const express_session_1 = __importDefault(require("express-session"));
-const passport_1 = __importDefault(require("passport"));
+const passport_1 = __importDefault(require("./config/passport"));
 const winston_1 = __importDefault(require("winston"));
 const secrets_1 = require("./util/secrets");
 const connect_session_sequelize_1 = __importDefault(require("connect-session-sequelize"));

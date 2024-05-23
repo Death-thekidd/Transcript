@@ -88,4 +88,5 @@ exports.isAuthenticated = isAuthenticated;
 // 		res.status(403).send({ message: "You've been signed out" });
 // 	}
 // };
+exports.default = passport_1.default;
 //# sourceMappingURL=passport.js.map

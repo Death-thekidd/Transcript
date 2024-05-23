@@ -88,3 +88,5 @@ export const isAuthenticated = (
 // 		res.status(403).send({ message: "You've been signed out" });
 // 	}
 // };
+
+export default passport;
