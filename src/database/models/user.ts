@@ -5,6 +5,7 @@ import Role, { RoleAttributes } from "./role";
 import Wallet from "./wallet";
 import College, { CollegeAttributes } from "./college";
 import Department, { DepartmentAttributes } from "./department";
+import bcrypt from "bcrypt-nodejs";
 
 export interface UserAttributes {
 	id?: Identifier;
@@ -42,7 +43,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
 	comparePassword: (
 		candidatePassword: string,
 		cb: (err: any, isMatch: any) => void
-	) => Promise<boolean>;
+	) => Promise<void>;
 	getRoles: () => Promise<Role[]>;
 	addRole: (role: RoleAttributes) => Promise<any>;
 	removeRole: (role: RoleAttributes) => Promise<any>;
@@ -81,6 +82,22 @@ User.init(
 		modelName: "User",
 	}
 );
+
+// Password hash middleware
+User.beforeCreate(async (user) => {
+	if (user.password) {
+		const salt = bcrypt.genSaltSync(10);
+		user.password = bcrypt.hashSync(user.password, salt);
+	}
+});
+
+// Method to compare passwords
+User.prototype.comparePassword = async function (
+	candidatePassword: string,
+	cb: (err: any, isMatch: any) => void
+) {
+	cb(undefined, bcrypt.compareSync(candidatePassword, this.password));
+};
 
 User.hasMany(Transaction, { foreignKey: "userId" });
 Transaction.belongsTo(User, {
