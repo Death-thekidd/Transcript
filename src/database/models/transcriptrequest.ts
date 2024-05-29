@@ -81,15 +81,15 @@ TranscriptRequest.init(
 );
 
 TranscriptRequest.belongsToMany(Destination, {
-	through: "TranscriptRequestDestination",
+	through: "TranscriptRequestDestinations",
 });
 
 Destination.belongsToMany(TranscriptRequest, {
-	through: "TranscriptRequestDestination",
+	through: "TranscriptRequestDestinations",
 });
 
 TranscriptType.hasMany(TranscriptRequest, { foreignKey: "transcriptTypeId" });
-TranscriptRequest.belongsTo(TranscriptRequest, {
+TranscriptRequest.belongsTo(TranscriptType, {
 	foreignKey: "transcriptTypeId",
 });
 

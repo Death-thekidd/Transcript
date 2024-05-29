@@ -1,9 +1,12 @@
-// src/services/transcriptRequestService.ts
 import TranscriptRequest from "../database/models/transcriptrequest";
 import User from "../database/models/user";
 import Destination from "../database/models/destination";
 import TranscriptType from "../database/models/transcripttype";
 import { Identifier } from "sequelize";
+
+const PAYSTACK_TRANSACTION_PERCENTAGE = 0.015; // Paystack charges 1.5%
+const PAYSTACK_TRANSACTION_CAP = 2000; // The maximum Paystack transaction fee is ₦2000
+const PAYSTACK_ADDITIONAL_CHARGE = 100; // An additional ₦100 charge for international transactions (if applicable)
 
 export async function getAllTranscriptRequests(): Promise<TranscriptRequest[]> {
 	return await TranscriptRequest.findAll({
@@ -34,6 +37,33 @@ export async function createTranscriptRequest(data: {
 	const transcriptType = await TranscriptType.findOne({
 		where: { name: data.transcriptType },
 	});
+	if (!transcriptType) {
+		throw new Error("Transcript type not found.");
+	}
+
+	// Calculate the total amount
+	let totalAmount = transcriptType.amount;
+
+	for (const destinationId of data.destinations) {
+		const destination = await Destination.findByPk(destinationId);
+		if (destination) {
+			totalAmount += destination.rate;
+		} else {
+			throw new Error(`Destination with id ${destinationId} not found.`);
+		}
+	}
+
+	// Calculate Paystack transaction fee
+	let transactionFee = totalAmount * PAYSTACK_TRANSACTION_PERCENTAGE;
+	if (transactionFee > PAYSTACK_TRANSACTION_CAP) {
+		transactionFee = PAYSTACK_TRANSACTION_CAP;
+	}
+	// if (/* condition to check if it is an international transaction */) {
+	// 	transactionFee += PAYSTACK_ADDITIONAL_CHARGE;
+	// }
+
+	const total = totalAmount + transactionFee;
+
 	const request = await TranscriptRequest.create({
 		collegeId: user.collegeId,
 		departmentId: user.departmentId,
@@ -41,7 +71,7 @@ export async function createTranscriptRequest(data: {
 		transcriptTypeId: transcriptType.id,
 		status: "pending",
 		userId: data.userId,
-		total: transcriptType.amount,
+		total,
 	});
 
 	for (const destinationId of data.destinations) {

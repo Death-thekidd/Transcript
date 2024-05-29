@@ -18,6 +18,7 @@ const https_1 = __importDefault(require("https"));
 const secrets_1 = require("../util/secrets");
 const crypto_1 = __importDefault(require("crypto"));
 const transcriptrequest_1 = __importDefault(require("../database/models/transcriptrequest"));
+const transaction_1 = __importDefault(require("../database/models/transaction"));
 const initializePayment = ({ email, transcriptRequestId, }) => __awaiter(void 0, void 0, void 0, function* () {
     const transcriptRequest = yield transcriptrequest_1.default.findByPk(transcriptRequestId);
     if (!transcriptRequest)
@@ -67,9 +68,20 @@ const verifyPayment = (reqBody, headers) => __awaiter(void 0, void 0, void 0, fu
     if (hash === headers["x-paystack-signature"]) {
         const event = reqBody;
         if (event && event.event === "charge.success") {
-            const { metadata: { transcriptRequestId }, } = event.data;
+            const { id: transactionId, customer: { email }, amount, metadata: { transcriptRequestId, userId, name }, } = event.data;
             const [affectedCount] = yield transcriptrequest_1.default.update({ status: "paid" }, { where: { id: transcriptRequestId } });
             if (affectedCount > 0) {
+                // Record the transaction
+                yield transaction_1.default.create({
+                    userId,
+                    transactionId,
+                    name,
+                    email,
+                    amount: amount / 100,
+                    currency: "NGN",
+                    paymentStatus: "paid",
+                    paymentGateway: "paystack",
+                });
                 return yield transcriptrequest_1.default.findByPk(transcriptRequestId);
             }
         }

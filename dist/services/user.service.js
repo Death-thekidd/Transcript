@@ -22,7 +22,7 @@ const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getAllUsers = getAllUsers;
 const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield user_1.default.findByPk(id);
+    return yield user_1.default.findByPk(id, { include: [role_1.default] });
 });
 exports.getUserById = getUserById;
 const updateUser = (userId, userData) => __awaiter(void 0, void 0, void 0, function* () {

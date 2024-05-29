@@ -13,11 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTranscriptRequest = exports.updateTranscriptRequestStatus = exports.createTranscriptRequest = exports.getTranscriptRequestById = exports.getAllTranscriptRequests = void 0;
-// src/services/transcriptRequestService.ts
 const transcriptrequest_1 = __importDefault(require("../database/models/transcriptrequest"));
 const user_1 = __importDefault(require("../database/models/user"));
 const destination_1 = __importDefault(require("../database/models/destination"));
 const transcripttype_1 = __importDefault(require("../database/models/transcripttype"));
+const PAYSTACK_TRANSACTION_PERCENTAGE = 0.015; // Paystack charges 1.5%
+const PAYSTACK_TRANSACTION_CAP = 2000; // The maximum Paystack transaction fee is ₦2000
+const PAYSTACK_ADDITIONAL_CHARGE = 100; // An additional ₦100 charge for international transactions (if applicable)
 function getAllTranscriptRequests() {
     return __awaiter(this, void 0, void 0, function* () {
         return yield transcriptrequest_1.default.findAll({
@@ -45,6 +47,29 @@ function createTranscriptRequest(data) {
         const transcriptType = yield transcripttype_1.default.findOne({
             where: { name: data.transcriptType },
         });
+        if (!transcriptType) {
+            throw new Error("Transcript type not found.");
+        }
+        // Calculate the total amount
+        let totalAmount = transcriptType.amount;
+        for (const destinationId of data.destinations) {
+            const destination = yield destination_1.default.findByPk(destinationId);
+            if (destination) {
+                totalAmount += destination.rate;
+            }
+            else {
+                throw new Error(`Destination with id ${destinationId} not found.`);
+            }
+        }
+        // Calculate Paystack transaction fee
+        let transactionFee = totalAmount * PAYSTACK_TRANSACTION_PERCENTAGE;
+        if (transactionFee > PAYSTACK_TRANSACTION_CAP) {
+            transactionFee = PAYSTACK_TRANSACTION_CAP;
+        }
+        // if (/* condition to check if it is an international transaction */) {
+        // 	transactionFee += PAYSTACK_ADDITIONAL_CHARGE;
+        // }
+        const total = totalAmount + transactionFee;
         const request = yield transcriptrequest_1.default.create({
             collegeId: user.collegeId,
             departmentId: user.departmentId,
@@ -52,7 +77,7 @@ function createTranscriptRequest(data) {
             transcriptTypeId: transcriptType.id,
             status: "pending",
             userId: data.userId,
-            total: transcriptType.amount,
+            total,
         });
         for (const destinationId of data.destinations) {
             const destination = yield destination_1.default.findByPk(destinationId);

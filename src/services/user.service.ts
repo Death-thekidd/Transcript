@@ -15,7 +15,7 @@ export const getAllUsers = async (): Promise<User[]> => {
 };
 
 export const getUserById = async (id: string): Promise<User | null> => {
-	return await User.findByPk(id);
+	return await User.findByPk(id, { include: [Role] });
 };
 
 export const updateUser = async (

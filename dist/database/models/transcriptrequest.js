@@ -44,13 +44,13 @@ TranscriptRequest.init({
     modelName: "TranscriptRequest",
 });
 TranscriptRequest.belongsToMany(destination_1.default, {
-    through: "TranscriptRequestDestination",
+    through: "TranscriptRequestDestinations",
 });
 destination_1.default.belongsToMany(TranscriptRequest, {
-    through: "TranscriptRequestDestination",
+    through: "TranscriptRequestDestinations",
 });
 transcripttype_1.default.hasMany(TranscriptRequest, { foreignKey: "transcriptTypeId" });
-TranscriptRequest.belongsTo(TranscriptRequest, {
+TranscriptRequest.belongsTo(transcripttype_1.default, {
     foreignKey: "transcriptTypeId",
 });
 college_1.default.hasMany(TranscriptRequest, { foreignKey: "collegeId" });

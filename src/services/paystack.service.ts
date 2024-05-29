@@ -4,6 +4,7 @@ import { PAYSTACK_PUBLIC_KEY, PAYSTACK_SECRET_KEY } from "../util/secrets";
 import crypto from "crypto";
 import TranscriptRequest from "../database/models/transcriptrequest";
 import { PaystackEvent, PaystackHeaders } from "../types/paystack";
+import Transaction from "../database/models/transaction";
 
 interface InitializePaymentParams {
 	email: string;
@@ -87,13 +88,30 @@ export const verifyPayment = async (
 		const event = reqBody;
 		if (event && event.event === "charge.success") {
 			const {
-				metadata: { transcriptRequestId },
+				id: transactionId,
+				customer: { email },
+				amount,
+				metadata: { transcriptRequestId, userId, name },
 			} = event.data;
+
 			const [affectedCount] = await TranscriptRequest.update(
 				{ status: "paid" },
 				{ where: { id: transcriptRequestId } }
 			);
+
 			if (affectedCount > 0) {
+				// Record the transaction
+				await Transaction.create({
+					userId,
+					transactionId,
+					name,
+					email,
+					amount: amount / 100, // Assuming amount is in kobo and converting to Naira
+					currency: "NGN",
+					paymentStatus: "paid",
+					paymentGateway: "paystack",
+				});
+
 				return await TranscriptRequest.findByPk(transcriptRequestId);
 			}
 		}
