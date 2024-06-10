@@ -18,6 +18,7 @@ const transcriptType_router_1 = __importDefault(require("../routers/transcriptTy
 const userDestinationRequest_router_1 = __importDefault(require("../routers/userDestinationRequest.router"));
 const wallet_router_1 = __importDefault(require("../routers/wallet.router"));
 const walletTransaction_router_1 = __importDefault(require("../routers/walletTransaction.router"));
+const adminDashboard_router_1 = __importDefault(require("../routers/adminDashboard.router"));
 const router = express_1.Router();
 // Authentication Routes
 router.use("/auth", auth_router_1.default);
@@ -48,5 +49,6 @@ router.use("/transcript-type", transcriptType_router_1.default);
 router.use("/user-destination-request", userDestinationRequest_router_1.default);
 router.use("/wallet", wallet_router_1.default);
 router.use("/wallet-transaction", walletTransaction_router_1.default);
+router.use("/admin-dashboard", adminDashboard_router_1.default);
 exports.default = router;
 //# sourceMappingURL=index.router.js.map

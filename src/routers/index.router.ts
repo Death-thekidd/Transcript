@@ -14,6 +14,7 @@ import transcriptTypeRoutes from "../routers/transcriptType.router";
 import userDestinationRequestRoutes from "../routers/userDestinationRequest.router";
 import walletRoutes from "../routers/wallet.router";
 import walletTransactionRoutes from "../routers/walletTransaction.router";
+import adminDashboardRoutes from "../routers/adminDashboard.router";
 
 const router = Router();
 
@@ -47,5 +48,6 @@ router.use("/transcript-type", transcriptTypeRoutes);
 router.use("/user-destination-request", userDestinationRequestRoutes);
 router.use("/wallet", walletRoutes);
 router.use("/wallet-transaction", walletTransactionRoutes);
+router.use("/admin-dashboard", adminDashboardRoutes);
 
 export default router;

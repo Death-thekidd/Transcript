@@ -1,5 +1,6 @@
 import { Model, DataTypes, Identifier } from "sequelize";
 import connection from "../connection";
+import User from "./user";
 
 enum CurrencyType {
 	NGN = "NGN",
@@ -36,6 +37,7 @@ class Transaction
 	public id!: Identifier;
 	public name!: string;
 	public userId?: Identifier;
+	public User: User;
 	public transactionId?: number;
 	public email: string;
 	public amount: number;
