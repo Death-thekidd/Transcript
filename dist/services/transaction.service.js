@@ -92,6 +92,7 @@ function getRecentTransactions(limit = 4) {
             return ({
                 name: ((_a = transaction.User) === null || _a === void 0 ? void 0 : _a.name) || "Unknown",
                 createdAt: transaction.createdAt,
+                amount: transaction.amount,
             });
         });
     });

@@ -22,6 +22,7 @@ const adminDashboard_router_1 = __importDefault(require("../routers/adminDashboa
 const router = express_1.Router();
 // Authentication Routes
 router.use("/auth", auth_router_1.default);
+router.use("/paystack", paystack_router_1.default);
 router.use((req, res, next) => {
     // Passport.js isAuthenticated() method checks if a user is authenticated
     if (req.isAuthenticated()) {
@@ -40,7 +41,6 @@ router.use("/user", user_router_1.default);
 router.use("/college", college_router_1.default);
 router.use("/department", department_router_1.default);
 router.use("/destination", destination_router_1.default);
-router.use("/paystack", paystack_router_1.default);
 router.use("/privilege", privilege_router_1.default);
 router.use("/role", role_router_1.default);
 router.use("/transaction", transaction_router_1.default);

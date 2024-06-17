@@ -20,6 +20,7 @@ const router = Router();
 
 // Authentication Routes
 router.use("/auth", authRoutes);
+router.use("/paystack", paystackRoutes);
 
 router.use((req, res, next) => {
 	// Passport.js isAuthenticated() method checks if a user is authenticated
@@ -39,7 +40,6 @@ router.use("/user", userRoutes);
 router.use("/college", collegeRoutes);
 router.use("/department", departmentRoutes);
 router.use("/destination", destinationRoutes);
-router.use("/paystack", paystackRoutes);
 router.use("/privilege", privilegeRoutes);
 router.use("/role", roleRoutes);
 router.use("/transaction", transactionRoutes);
