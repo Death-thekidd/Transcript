@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTranscriptRequest = exports.updateTranscriptRequestStatus = exports.createTranscriptRequest = exports.getTranscriptRequestById = exports.getAllTranscriptRequests = void 0;
+exports.getRecentTranscriptRequests = exports.deleteTranscriptRequest = exports.updateTranscriptRequestStatus = exports.createTranscriptRequest = exports.getTranscriptRequestById = exports.getAllTranscriptRequests = void 0;
 const transcriptrequest_1 = __importDefault(require("../database/models/transcriptrequest"));
 const user_1 = __importDefault(require("../database/models/user"));
 const destination_1 = __importDefault(require("../database/models/destination"));
@@ -104,4 +104,25 @@ function deleteTranscriptRequest(id) {
     });
 }
 exports.deleteTranscriptRequest = deleteTranscriptRequest;
+function getRecentTranscriptRequests(limit = 4, id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const transcriptRequests = yield transcriptrequest_1.default.findAll({
+            limit,
+            order: [["createdAt", "DESC"]],
+            where: { userId: id },
+            include: [user_1.default, transcripttype_1.default],
+        });
+        const requests = yield Promise.all(transcriptRequests.map((request) => __awaiter(this, void 0, void 0, function* () {
+            return ({
+                type: (yield request.getTranscriptType()).name || "Unknown",
+                createdAt: request.createdAt,
+                fee: request.total,
+                status: request.status,
+                matricNo: request.matricNo,
+            });
+        })));
+        return requests;
+    });
+}
+exports.getRecentTranscriptRequests = getRecentTranscriptRequests;
 //# sourceMappingURL=transcriptRequest.service.js.map

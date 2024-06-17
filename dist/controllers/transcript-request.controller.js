@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTranscriptRequest = exports.updateTranscriptRequestStatus = exports.submitTranscriptRequest = exports.getTranscriptRequest = exports.getTranscriptRequests = void 0;
+exports.deleteTranscriptRequest = exports.updateTranscriptRequestStatus = exports.submitTranscriptRequest = exports.getTranscriptRequest = exports.getRecentTranscriptRequests = exports.getTranscriptRequests = void 0;
 const transcriptRequestService = __importStar(require("../services/transcriptRequest.service"));
 const express_validator_1 = require("express-validator");
 const getTranscriptRequests = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -41,6 +41,16 @@ const getTranscriptRequests = (req, res, next) => __awaiter(void 0, void 0, void
     }
 });
 exports.getTranscriptRequests = getTranscriptRequests;
+const getRecentTranscriptRequests = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const transcriptRequests = yield transcriptRequestService.getRecentTranscriptRequests(5, req.params.id);
+        return res.status(200).json({ data: transcriptRequests });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.getRecentTranscriptRequests = getRecentTranscriptRequests;
 const getTranscriptRequest = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const transcriptRequestId = req.params.id;

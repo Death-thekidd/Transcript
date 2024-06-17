@@ -4,6 +4,14 @@ import Destination from "../database/models/destination";
 import TranscriptType from "../database/models/transcripttype";
 import { Identifier } from "sequelize";
 
+interface RecentRequest {
+	type: string;
+	matricNo: string;
+	fee: number;
+	status: string;
+	createdAt: Date;
+}
+
 const PAYSTACK_TRANSACTION_PERCENTAGE = 0.015; // Paystack charges 1.5%
 const PAYSTACK_TRANSACTION_CAP = 2000; // The maximum Paystack transaction fee is ₦2000
 const PAYSTACK_ADDITIONAL_CHARGE = 100; // An additional ₦100 charge for international transactions (if applicable)
@@ -96,4 +104,28 @@ export async function deleteTranscriptRequest(id: string): Promise<boolean> {
 		return true;
 	}
 	return false;
+}
+
+export async function getRecentTranscriptRequests(
+	limit: number = 4,
+	id: Identifier
+): Promise<RecentRequest[]> {
+	const transcriptRequests = await TranscriptRequest.findAll({
+		limit,
+		order: [["createdAt", "DESC"]],
+		where: { userId: id },
+		include: [User, TranscriptType],
+	});
+
+	const requests = await Promise.all(
+		transcriptRequests.map(async (request) => ({
+			type: (await request.getTranscriptType()).name || "Unknown", // Assuming User model has a name attribute
+			createdAt: request.createdAt,
+			fee: request.total,
+			status: request.status,
+			matricNo: request.matricNo,
+		}))
+	);
+
+	return requests;
 }

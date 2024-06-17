@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as transcriptRequestService from "../services/transcriptRequest.service";
 import { validationResult } from "express-validator";
+import { Identifier } from "sequelize";
 
 export const getTranscriptRequests = async (
 	req: Request,
@@ -11,6 +12,23 @@ export const getTranscriptRequests = async (
 	try {
 		const transcriptRequests =
 			await transcriptRequestService.getAllTranscriptRequests();
+		return res.status(200).json({ data: transcriptRequests });
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const getRecentTranscriptRequests = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<Response> => {
+	try {
+		const transcriptRequests =
+			await transcriptRequestService.getRecentTranscriptRequests(
+				5,
+				req.params.id as Identifier
+			);
 		return res.status(200).json({ data: transcriptRequests });
 	} catch (error) {
 		next(error);

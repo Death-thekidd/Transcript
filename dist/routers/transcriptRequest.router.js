@@ -25,6 +25,7 @@ const express_validator_1 = require("express-validator");
 const transcriptRequestController = __importStar(require("../controllers/transcript-request.controller"));
 const router = express_1.Router();
 router.get("/transcript-requests", transcriptRequestController.getTranscriptRequests);
+router.get("/recent-transcript-requests/:id", transcriptRequestController.getRecentTranscriptRequests);
 router.get("/transcript-request/:id", express_validator_1.param("id").isString().withMessage("Transcript request ID must be a string"), transcriptRequestController.getTranscriptRequest);
 router.post("/submit-request", express_validator_1.body("userId").isString().withMessage("User ID must be a string"), express_validator_1.body("transcriptType")
     .isString()

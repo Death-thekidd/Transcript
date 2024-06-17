@@ -11,6 +11,11 @@ router.get(
 );
 
 router.get(
+	"/recent-transcript-requests/:id",
+	transcriptRequestController.getRecentTranscriptRequests
+);
+
+router.get(
 	"/transcript-request/:id",
 	param("id").isString().withMessage("Transcript request ID must be a string"),
 	transcriptRequestController.getTranscriptRequest
