@@ -3,6 +3,8 @@ import User from "../database/models/user";
 import Role from "../database/models/role";
 import bcrypt from "bcrypt-nodejs";
 import { Identifier } from "sequelize";
+import College from "../database/models/college";
+import Department from "../database/models/department";
 
 interface userData extends User {
 	college: Identifier;
@@ -11,11 +13,11 @@ interface userData extends User {
 }
 
 export const getAllUsers = async (): Promise<User[]> => {
-	return await User.findAll();
+	return await User.findAll({ include: [Role, College, Department] });
 };
 
 export const getUserById = async (id: string): Promise<User | null> => {
-	return await User.findByPk(id, { include: [Role] });
+	return await User.findByPk(id, { include: [Role, College, Department] });
 };
 
 export const updateUser = async (

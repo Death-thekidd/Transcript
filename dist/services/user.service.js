@@ -17,12 +17,14 @@ exports.deleteUserById = exports.updateUser = exports.getUserById = exports.getA
 const user_1 = __importDefault(require("../database/models/user"));
 const role_1 = __importDefault(require("../database/models/role"));
 const bcrypt_nodejs_1 = __importDefault(require("bcrypt-nodejs"));
+const college_1 = __importDefault(require("../database/models/college"));
+const department_1 = __importDefault(require("../database/models/department"));
 const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield user_1.default.findAll();
+    return yield user_1.default.findAll({ include: [role_1.default, college_1.default, department_1.default] });
 });
 exports.getAllUsers = getAllUsers;
 const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield user_1.default.findByPk(id, { include: [role_1.default] });
+    return yield user_1.default.findByPk(id, { include: [role_1.default, college_1.default, department_1.default] });
 });
 exports.getUserById = getUserById;
 const updateUser = (userId, userData) => __awaiter(void 0, void 0, void 0, function* () {
