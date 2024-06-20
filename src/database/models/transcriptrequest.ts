@@ -82,10 +82,14 @@ TranscriptRequest.init(
 
 TranscriptRequest.belongsToMany(Destination, {
 	through: "TranscriptRequestDestinations",
+	foreignKey: "transcriptRequestId",
+	otherKey: "destinationId",
 });
 
 Destination.belongsToMany(TranscriptRequest, {
 	through: "TranscriptRequestDestinations",
+	foreignKey: "destinationId",
+	otherKey: "transcriptRequestId",
 });
 
 TranscriptType.hasMany(TranscriptRequest, { foreignKey: "transcriptTypeId" });

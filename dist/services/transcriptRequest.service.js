@@ -17,13 +17,15 @@ const transcriptrequest_1 = __importDefault(require("../database/models/transcri
 const user_1 = __importDefault(require("../database/models/user"));
 const destination_1 = __importDefault(require("../database/models/destination"));
 const transcripttype_1 = __importDefault(require("../database/models/transcripttype"));
+const college_1 = __importDefault(require("../database/models/college"));
+const department_1 = __importDefault(require("../database/models/department"));
 const PAYSTACK_TRANSACTION_PERCENTAGE = 0.015; // Paystack charges 1.5%
 const PAYSTACK_TRANSACTION_CAP = 2000; // The maximum Paystack transaction fee is ₦2000
 const PAYSTACK_ADDITIONAL_CHARGE = 100; // An additional ₦100 charge for international transactions (if applicable)
 function getAllTranscriptRequests() {
     return __awaiter(this, void 0, void 0, function* () {
         return yield transcriptrequest_1.default.findAll({
-            include: [destination_1.default, transcripttype_1.default],
+            include: [destination_1.default, transcripttype_1.default, college_1.default, department_1.default, user_1.default],
         });
     });
 }
@@ -31,7 +33,7 @@ exports.getAllTranscriptRequests = getAllTranscriptRequests;
 function getTranscriptRequestById(id) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield transcriptrequest_1.default.findByPk(id, {
-            include: [destination_1.default, transcripttype_1.default],
+            include: [destination_1.default, transcripttype_1.default, college_1.default, department_1.default, user_1.default],
         });
     });
 }
@@ -39,7 +41,7 @@ exports.getTranscriptRequestById = getTranscriptRequestById;
 function createTranscriptRequest(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = yield user_1.default.findByPk(data.userId, {
-            include: [transcripttype_1.default],
+            include: [],
         });
         if (!user) {
             throw new Error("User not found.");
@@ -80,6 +82,7 @@ function createTranscriptRequest(data) {
             total,
         });
         for (const destinationId of data.destinations) {
+            console.log(destinationId);
             const destination = yield destination_1.default.findByPk(destinationId);
             yield request.addDestination(destination);
         }

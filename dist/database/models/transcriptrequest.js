@@ -45,9 +45,13 @@ TranscriptRequest.init({
 });
 TranscriptRequest.belongsToMany(destination_1.default, {
     through: "TranscriptRequestDestinations",
+    foreignKey: "transcriptRequestId",
+    otherKey: "destinationId",
 });
 destination_1.default.belongsToMany(TranscriptRequest, {
     through: "TranscriptRequestDestinations",
+    foreignKey: "destinationId",
+    otherKey: "transcriptRequestId",
 });
 transcripttype_1.default.hasMany(TranscriptRequest, { foreignKey: "transcriptTypeId" });
 TranscriptRequest.belongsTo(transcripttype_1.default, {

@@ -85,7 +85,6 @@ const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (error) {
-        next(error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
@@ -109,9 +108,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
     catch (error) {
         if (error.name === "SequelizeUniqueConstraintError") {
-            return res
-                .status(409)
-                .json({
+            return res.status(409).json({
                 error: "The email address is already associated with an account.",
             });
         }

@@ -65,6 +65,8 @@ export const submitTranscriptRequest = async (
 			return res.status(400).json({ errors: errors.array() });
 		}
 
+		console.log("BODY\n", req.body);
+
 		const request = await transcriptRequestService.createTranscriptRequest(
 			req.body
 		);

@@ -83,7 +83,6 @@ export const getUser = async (
 			},
 		});
 	} catch (error) {
-		next(error);
 		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
@@ -113,11 +112,9 @@ export const updateUser = async (
 			.json({ message: "Profile information has been updated." });
 	} catch (error) {
 		if (error.name === "SequelizeUniqueConstraintError") {
-			return res
-				.status(409)
-				.json({
-					error: "The email address is already associated with an account.",
-				});
+			return res.status(409).json({
+				error: "The email address is already associated with an account.",
+			});
 		}
 		next(error);
 		return res.status(500).json({ error: "Internal Server Error" });

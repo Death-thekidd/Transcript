@@ -71,6 +71,7 @@ const submitTranscriptRequest = (req, res) => __awaiter(void 0, void 0, void 0, 
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+        console.log("BODY\n", req.body);
         const request = yield transcriptRequestService.createTranscriptRequest(req.body);
         return res.status(201).json({
             message: "Transcript Request created successfully.",

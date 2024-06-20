@@ -3,6 +3,8 @@ import User from "../database/models/user";
 import Destination from "../database/models/destination";
 import TranscriptType from "../database/models/transcripttype";
 import { Identifier } from "sequelize";
+import College from "../database/models/college";
+import Department from "../database/models/department";
 
 interface RecentRequest {
 	type: string;
@@ -18,7 +20,7 @@ const PAYSTACK_ADDITIONAL_CHARGE = 100; // An additional ₦100 charge for inter
 
 export async function getAllTranscriptRequests(): Promise<TranscriptRequest[]> {
 	return await TranscriptRequest.findAll({
-		include: [Destination, TranscriptType],
+		include: [Destination, TranscriptType, College, Department, User],
 	});
 }
 
@@ -26,7 +28,7 @@ export async function getTranscriptRequestById(
 	id: string
 ): Promise<TranscriptRequest | null> {
 	return await TranscriptRequest.findByPk(id, {
-		include: [Destination, TranscriptType],
+		include: [Destination, TranscriptType, College, Department, User],
 	});
 }
 
@@ -36,7 +38,7 @@ export async function createTranscriptRequest(data: {
 	destinations: Identifier[];
 }): Promise<TranscriptRequest> {
 	const user = await User.findByPk(data.userId, {
-		include: [TranscriptType],
+		include: [],
 	});
 	if (!user) {
 		throw new Error("User not found.");
@@ -83,6 +85,7 @@ export async function createTranscriptRequest(data: {
 	});
 
 	for (const destinationId of data.destinations) {
+		console.log(destinationId);
 		const destination = await Destination.findByPk(destinationId);
 		await request.addDestination(destination);
 	}
